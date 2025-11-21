@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>医学影像AHA分型评估系统</title>
+    <link rel="stylesheet" href="static/css/style.css">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <div class="container">
+            <header>
+                <h1><span class="icon">🏥</span> 医学影像AHA分型评估系统</h1>
+            </header>
+
+            <!-- 登录区域 -->
+            <div v-if="!loggedIn" class="login-container card">
+                <h2><span class="icon">👤</span> 用户登录</h2>
+                <div class="form-group">
+                    <input type="text" v-model="username" @keyup.enter="login" placeholder="请输入您的用户名">
+                    <button @click="login" class="primary-btn">登录</button>
+                </div>
+                <p v-if="loginError" class="error-message">{{ loginError }}</p>
+            </div>
+
+            <!-- 主界面 -->
+            <main v-if="loggedIn">
+                <!-- 控制栏 -->
+                <div class="control-bar card">
+                    <div class="user-info">
+                        <span>欢迎, <strong>{{ username }}</strong>!</span>
+                    </div>
+                    <div class="progress-info">
+                        <span>进度: <strong>{{ patientIndex + 1 }} / {{ totalPatients }}</strong></span>
+                    </div>
+                    <div class="search-bar">
+                        <input type="text" v-model="barcodeSearch" placeholder="按条码号跳转">
+                        <button @click="jumpToPatient" class="secondary-btn">跳转</button>
+                    </div>
+                    <div class="export-section">
+                         <button @click="exportResults" class="export-btn">📥 导出结果</button>
+                    </div>
+                </div>
+                 <p v-if="statusMessage" class="status-message" :class="statusClass">{{ statusMessage }}</p>
+
+                <!-- 病人信息 -->
+                <div class="patient-info card">
+                    <div class="patient-header">
+                        <h2><span class="icon">📋</span> 病人信息</h2>
+                        <div class="barcode-info">
+                            <span class="barcode-label">条码号:</span>
+                            <span class="barcode-value">{{ currentPatient.barcode || 'N/A' }}</span>
+                        </div>
+                    </div>
+                    <div class="findings-section">
+                        <h3>检查所见</h3>
+                        <p class="findings">{{ currentPatient.findings || 'N/A' }}</p>
+                    </div>
+                </div>
+
+                <div class="main-content">
+                    <!-- 评估区域 -->
+                    <div class="assessment-container card">
+                        <h2><span class="icon">⭐</span> 医生评估</h2>
+                        
+                        <div class="slider-group">
+                            <h3>AHA分型评估</h3>
+                            <div class="slider-item">
+                                <label>左侧评估: <span class="slider-value">{{ romanLabels[leftAssessment] }}</span></label>
+                                <input type="range" min="1" max="8" v-model.number="leftAssessment">
+                            </div>
+                            <div class="slider-item">
+                                <label>右侧评估: <span class="slider-value">{{ romanLabels[rightAssessment] }}</span></label>
+                                <input type="range" min="1" max="8" v-model.number="rightAssessment">
+                            </div>
+                        </div>
+
+                        <div class="slider-group">
+                            <h3>有用性评估</h3>
+                            <div class="slider-item">
+                                <label>左侧有用性: <span class="slider-value">{{ leftConsistency }}</span></label>
+                                <input type="range" min="0" max="5" v-model.number="leftConsistency">
+                            </div>
+                            <div class="slider-item">
+                                <label>右侧有用性: <span class="slider-value">{{ rightConsistency }}</span></label>
+                                <input type="range" min="0" max="5" v-model.number="rightConsistency">
+                            </div>
+                        </div>
+
+                        <div class="time-spent">
+                            当前用时: <strong>{{ getFormattedTime() }}</strong>
+                        </div>
+
+                        <div class="submission-status" v-if="hasSubmitted">
+                            <span class="status-badge">✅ 已提交</span>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button @click="submitEvaluation" class="submit-btn" :class="{ 'btn-highlight': !hasSubmitted }">
+                                {{ hasSubmitted ? '重新提交' : '提交' }}
+                            </button>
+                            <button @click="nextPatient" class="primary-btn" :disabled="!hasSubmitted">
+                                下一个病人 ➡️
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- AI推理区域 -->
+                    <div class="ai-container card">
+                        <div class="ai-header">
+                            <h2><span class="icon">🤖</span> AI 推理</h2>
+                            <button @click="runAI" :disabled="aiLoading" class="ai-btn">
+                                {{ aiLoading ? '推理中...' : '启动AI分析' }}
+                            </button>
+                        </div>
+                        <div v-if="aiLoading" class="loading-spinner"></div>
+
+                        <!-- Formatted AI Result Display -->
+                        <div v-if="aiResultParsed" class="ai-result-formatted">
+                            <div class="inference-section">
+                                <h3>🧠 推理过程</h3>
+                                <p class="inference-text">{{ aiResultParsed.推理过程 }}</p>
+                            </div>
+
+                            <div v-if="aiResultParsed.AHA分型" class="aha-classification">
+                                <h3>📊 AHA分型结果</h3>
+                                <div class="classification-grid">
+                                    <div class="classification-item left">
+                                        <div class="label">左侧</div>
+                                        <div class="value">{{ aiResultParsed.AHA分型.左侧 || '无' }}</div>
+                                    </div>
+                                    <div class="classification-item right">
+                                        <div class="label">右侧</div>
+                                        <div class="value">{{ aiResultParsed.AHA分型.右侧 || '无' }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Raw AI Result Display (fallback) -->
+                        <div v-else-if="aiResult && !aiResultParsed" class="ai-result-raw">
+                            <pre>{{ aiResult }}</pre>
+                        </div>
+
+                        <div v-else class="ai-placeholder">
+                            点击 "启动AI分析" 获取结果。
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="static/js/app.js"></script>
+</body>
+</html>
