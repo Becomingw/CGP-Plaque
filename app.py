@@ -144,7 +144,7 @@ CORS(app)  # 允许跨域请求
 # 这里为了简化，我们为每个用户动态创建一个 "session"
 
 user_sessions = {}
-TABLE_PATH = r"/mnt/f/Project/AHA_LLM-main/aha_llm/aha_UI/test200.xlsx"
+TABLE_PATH = r"test200.xlsx"
 USER_DATA_PATH = r"user_data"
 os.makedirs(USER_DATA_PATH, exist_ok=True)
 system_prompt_file = os.path.join(os.path.dirname(__file__), "prompt_9.md")
@@ -153,7 +153,7 @@ with open(system_prompt_file, "r", encoding="utf-8") as f:
 
 
 # Load API configuration from api_config.json
-API_CONFIG_PATH = r"/mnt/f/Project/AHA_LLM-main/aha_llm/aha_UI/api_config.json"
+API_CONFIG_PATH = r"api_config.json"
 with open(API_CONFIG_PATH, "r", encoding="utf-8") as f:
     api_config_data = json.load(f)
 
@@ -194,7 +194,9 @@ def get_user_session(username):
             "table_df": None,
             "patient_labels": {},
             "current_patient_index": 0,
-            "start_time": None
+            "start_time": None,
+            "mode": "excel",  # "excel" or "custom"
+            "custom_findings": "",  # Temporary storage for custom input
         }
     return user_sessions[username]
 
@@ -225,6 +227,62 @@ def save_user_progress(username):
         logger.info(f"已保存用户进度: {user_file}")
     except Exception as e:
         logger.error(f"保存用户进度失败 {user_file}: {e}")
+
+def load_custom_evaluations(username):
+    """Load custom evaluations from {username}_custom.json"""
+    custom_file = os.path.join(USER_DATA_PATH, f"{username}_custom.json")
+    if os.path.exists(custom_file):
+        try:
+            with open(custom_file, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception as e:
+            logger.error(f"读取自定义评估失败 {custom_file}: {e}")
+            return {}
+    return {}
+
+def save_custom_evaluation(username, custom_id, evaluation_data):
+    """Save a custom evaluation to {username}_custom.json"""
+    custom_file = os.path.join(USER_DATA_PATH, f"{username}_custom.json")
+
+    # Load existing evaluations
+    evaluations = load_custom_evaluations(username)
+
+    # Add new evaluation
+    evaluations[custom_id] = evaluation_data
+
+    # Save back to file
+    try:
+        with open(custom_file, 'w', encoding='utf-8') as f:
+            json.dump(evaluations, f, ensure_ascii=False, indent=2)
+        logger.info(f"已保存自定义评估: {custom_file} - {custom_id}")
+    except Exception as e:
+        logger.error(f"保存自定义评估失败 {custom_file}: {e}")
+        raise
+
+def get_all_custom_evaluations(username):
+    """Get all custom evaluations as a list sorted by timestamp"""
+    evaluations = load_custom_evaluations(username)
+
+    # Convert dict to list and sort by timestamp (newest first)
+    eval_list = []
+    for custom_id, data in evaluations.items():
+        eval_list.append({
+            "custom_id": custom_id,
+            "findings": data.get("findings", ""),
+            "timestamp": data.get("timestamp", ""),
+            "labels": {
+                "left_assessment": data.get("left_assessment", "I"),
+                "right_assessment": data.get("right_assessment", "I"),
+                "left_usefulness": data.get("left_usefulness", "0"),
+                "right_usefulness": data.get("right_usefulness", "0")
+            },
+            "time_spent": data.get("time_spent", 0),
+            "ai_result": data.get("ai_result", "")
+        })
+
+    # Sort by timestamp descending (newest first)
+    eval_list.sort(key=lambda x: x["timestamp"], reverse=True)
+    return eval_list
 
 def get_current_patient_data(username):
     session = get_user_session(username)
@@ -298,6 +356,25 @@ def login():
     except Exception as e:
         logger.error(f"登录失败: {e}")
         return jsonify({"error": f"服务器内部错误: {e}"}), 500
+
+@app.route('/api/mode/switch', methods=['POST'])
+def switch_mode():
+    """Switch between excel and custom mode"""
+    data = request.json
+    username = data.get('username')
+    mode = data.get('mode', 'excel')  # 'excel' or 'custom'
+
+    if mode not in ['excel', 'custom']:
+        return jsonify({"error": "无效的模式"}), 400
+
+    session = get_user_session(username)
+    session["mode"] = mode
+
+    logger.info(f"用户 {username} 切换到 {mode} 模式")
+    return jsonify({
+        "mode": mode,
+        "message": f"已切换到{'Excel' if mode == 'excel' else '自定义输入'}模式"
+    })
 
 @app.route('/api/patient/navigate', methods=['POST'])
 def navigate_patient():
@@ -375,11 +452,116 @@ def submit_evaluation():
     session["patient_labels"][barcode]["time_spent"] = time_spent
 
     save_user_progress(username)
-    
+
     return jsonify({
         "message": "提交成功",
         "time_spent": time_spent
     })
+
+@app.route('/api/custom/submit', methods=['POST'])
+def submit_custom_evaluation():
+    """Submit a custom evaluation"""
+    data = request.json
+    username = data.get('username')
+    findings = data.get('findings', '').strip()
+    labels = data.get('labels', {})
+    ai_result = data.get('ai_result', '')
+
+    if not username:
+        return jsonify({"error": "用户名不能为空"}), 400
+
+    if not findings:
+        return jsonify({"error": "检查所见不能为空"}), 400
+
+    session = get_user_session(username)
+
+    # Calculate time spent
+    time_spent = 0
+    if session["start_time"]:
+        time_spent = time.time() - session["start_time"]
+
+    # Generate custom ID with timestamp
+    timestamp = time.strftime("%Y%m%d_%H%M%S")
+    custom_id = f"CUSTOM_{timestamp}"
+
+    # Prepare evaluation data
+    evaluation_data = {
+        "custom_id": custom_id,
+        "findings": findings,
+        "left_assessment": RomanConverter.int_to_roman(labels.get("left_assessment", 1)),
+        "right_assessment": RomanConverter.int_to_roman(labels.get("right_assessment", 1)),
+        "left_usefulness": str(labels.get("left_usefulness", 0)),
+        "right_usefulness": str(labels.get("right_usefulness", 0)),
+        "time_spent": time_spent,
+        "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+        "ai_result": ai_result
+    }
+
+    try:
+        save_custom_evaluation(username, custom_id, evaluation_data)
+        logger.info(f"用户 {username} 提交自定义评估: {custom_id}")
+        return jsonify({
+            "custom_id": custom_id,
+            "message": "自定义评估已保存",
+            "time_spent": time_spent
+        })
+    except Exception as e:
+        logger.error(f"保存自定义评估失败: {e}")
+        return jsonify({"error": f"保存失败: {str(e)}"}), 500
+
+@app.route('/api/custom/list', methods=['POST'])
+def list_custom_evaluations():
+    """Get list of all custom evaluations for a user"""
+    data = request.json
+    username = data.get('username')
+
+    if not username:
+        return jsonify({"error": "用户名不能为空"}), 400
+
+    try:
+        evaluations = get_all_custom_evaluations(username)
+        return jsonify({"evaluations": evaluations})
+    except Exception as e:
+        logger.error(f"获取自定义评估列表失败: {e}")
+        return jsonify({"error": f"获取列表失败: {str(e)}"}), 500
+
+@app.route('/api/custom/load', methods=['POST'])
+def load_custom_evaluation():
+    """Load a specific custom evaluation by ID"""
+    data = request.json
+    username = data.get('username')
+    custom_id = data.get('custom_id', '').strip()
+
+    if not username:
+        return jsonify({"error": "用户名不能为空"}), 400
+
+    if not custom_id:
+        return jsonify({"error": "自定义ID不能为空"}), 400
+
+    try:
+        evaluations = load_custom_evaluations(username)
+        if custom_id not in evaluations:
+            return jsonify({"error": f"未找到自定义评估: {custom_id}"}), 404
+
+        eval_data = evaluations[custom_id]
+
+        # Convert Roman numerals to integers for frontend
+        return jsonify({
+            "custom_id": custom_id,
+            "findings": eval_data.get("findings", ""),
+            "labels": {
+                "left_assessment": RomanConverter.roman_to_int(eval_data.get("left_assessment", "I")),
+                "right_assessment": RomanConverter.roman_to_int(eval_data.get("right_assessment", "I")),
+                "left_usefulness": int(eval_data.get("left_usefulness", 0)),
+                "right_usefulness": int(eval_data.get("right_usefulness", 0))
+            },
+            "time_spent": eval_data.get("time_spent", 0),
+            "timestamp": eval_data.get("timestamp", ""),
+            "ai_result": eval_data.get("ai_result", "")
+        })
+    except Exception as e:
+        logger.error(f"加载自定义评估失败: {e}")
+        return jsonify({"error": f"加载失败: {str(e)}"}), 500
 
 @app.route('/api/export', methods=['POST'])
 def export_results():
@@ -387,10 +569,11 @@ def export_results():
     username = data.get('username')
     session = get_user_session(username)
     df = session["table_df"]
-    
+
     if df is None:
         return jsonify({"error": "没有数据可导出"}), 400
 
+    # Prepare Excel evaluations sheet
     df_export = df.copy()
     df_export["左侧评估"] = ""
     df_export["右侧评估"] = ""
@@ -409,10 +592,41 @@ def export_results():
             df_export.at[idx, "时间"] = labels.get("time_spent", 0)
 
     df_export = df_export.loc[:, ~df_export.columns.str.contains('Unnamed')]
-    
+
+    # Load custom evaluations
+    custom_evaluations = load_custom_evaluations(username)
+
+    # Create Excel file with multiple sheets
     with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as tmp:
         output_path = tmp.name
-        df_export.to_excel(output_path, index=False, engine='openpyxl')
+
+        with pd.ExcelWriter(output_path, engine='openpyxl') as writer:
+            # Write Excel evaluations sheet
+            df_export.to_excel(writer, sheet_name='Excel评估', index=False)
+
+            # Write custom evaluations sheet if there are any
+            if custom_evaluations:
+                custom_data = []
+                for custom_id, eval_data in custom_evaluations.items():
+                    # Truncate AI result if too long
+                    ai_result = eval_data.get("ai_result", "")
+                    if len(ai_result) > 500:
+                        ai_result = ai_result[:500] + "..."
+
+                    custom_data.append({
+                        "自定义ID": custom_id,
+                        "时间戳": eval_data.get("timestamp", ""),
+                        "检查所见": eval_data.get("findings", ""),
+                        "左侧评估": eval_data.get("left_assessment", "I"),
+                        "右侧评估": eval_data.get("right_assessment", "I"),
+                        "左侧有用性": eval_data.get("left_usefulness", "0"),
+                        "右侧有用性": eval_data.get("right_usefulness", "0"),
+                        "用时(秒)": eval_data.get("time_spent", 0),
+                        "AI结果": ai_result
+                    })
+
+                df_custom = pd.DataFrame(custom_data)
+                df_custom.to_excel(writer, sheet_name='自定义评估', index=False)
 
     return send_file(output_path, as_attachment=True, download_name=f"{username}_export_{int(time.time())}.xlsx")
 

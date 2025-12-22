@@ -1,0 +1,29 @@
+{
+    "api_configs": [
+      {
+        "name": "硅基流动-DeepSeek-V3",
+        "base_url": "https://api.siliconflow.cn/v1",
+        "api_key": "XXXX",
+        "model": "deepseek-ai/DeepSeek-V3",
+        "max_tokens": 2000,
+        "temperature": 0.3,
+        "enable_thinking": false,
+        "thinking_budget": 2048,
+        "timeout": 30,
+        "request_delay": 1.0,
+        "enabled": false
+      },
+      {
+        "name": "deepseek-r1",
+        "base_url": "http://192.168.8.17:9990/v1",
+        "api_key": "REPLACE_WITH_YOUR_API_KEY",
+        "model": "deepseek-r1",
+        "max_tokens": 16000,
+        "temperature": 0.1,
+        "thinking_budget": 2048,
+        "timeout": 100,
+        "enabled": true
+      }
+    ],
+    "use_name": "deepseek-r1" 
+  }

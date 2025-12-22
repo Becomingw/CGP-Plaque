@@ -3,24 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>医学影像AHA分型评估系统</title>
+    <title>医学影像AHA分型评估系统 | Medical Imaging AHA Classification System</title>
     <link rel="stylesheet" href="static/css/style.css">
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 <body>
     <div id="app">
+        <!-- Language Switcher -->
+        <div class="language-switcher">
+            <span class="lang-option" :class="{ active: language === 'zh' }" @click="switchLanguage('zh')">中文</span>
+            <span class="separator">|</span>
+            <span class="lang-option" :class="{ active: language === 'en' }" @click="switchLanguage('en')">EN</span>
+        </div>
+
         <div class="container">
             <header>
-                <h1><span class="icon">🏥</span> 医学影像AHA分型评估系统</h1>
+                <h1><span class="icon">🏥</span> {{ t.title }}</h1>
             </header>
+
+            <!-- Mode Toggle (shown after login) -->
+            <div v-if="loggedIn" class="mode-toggle">
+                <button
+                    :class="{'active': mode === 'excel'}"
+                    @click="switchMode('excel')"
+                    class="mode-btn">
+                    📊 {{ t.mode.excel }}
+                </button>
+                <button
+                    :class="{'active': mode === 'custom'}"
+                    @click="switchMode('custom')"
+                    class="mode-btn">
+                    ✏️ {{ t.mode.custom }}
+                </button>
+            </div>
 
             <!-- 登录区域 -->
             <div v-if="!loggedIn" class="login-container card">
-                <h2><span class="icon">👤</span> 用户登录</h2>
+                <h2><span class="icon">👤</span> {{ t.login.title }}</h2>
                 <div class="form-group">
-                    <input type="text" v-model="username" @keyup.enter="login" placeholder="请输入您的用户名">
-                    <button @click="login" class="primary-btn">登录</button>
+                    <input
+                        type="text"
+                        v-model="username"
+                        @keyup.enter="login"
+                        :placeholder="t.login.placeholder"
+                    >
+                    <button @click="login" class="primary-btn">{{ t.login.button }}</button>
                 </div>
                 <p v-if="loginError" class="error-message">{{ loginError }}</p>
             </div>
@@ -30,79 +58,127 @@
                 <!-- 控制栏 -->
                 <div class="control-bar card">
                     <div class="user-info">
-                        <span>欢迎, <strong>{{ username }}</strong>!</span>
+                        <span>{{ t.control.welcome }}, <strong>{{ username }}</strong>!</span>
                     </div>
-                    <div class="progress-info">
-                        <span>进度: <strong>{{ patientIndex + 1 }} / {{ totalPatients }}</strong></span>
+                    <div v-if="mode === 'excel'" class="progress-info">
+                        <span>{{ t.control.progress }}: <strong>{{ patientIndex + 1 }} / {{ totalPatients }}</strong></span>
                     </div>
-                    <div class="search-bar">
-                        <input type="text" v-model="barcodeSearch" placeholder="按条码号跳转">
-                        <button @click="jumpToPatient" class="secondary-btn">跳转</button>
+                    <div v-if="mode === 'excel'" class="search-bar">
+                        <input
+                            type="text"
+                            v-model="barcodeSearch"
+                            :placeholder="t.control.searchPlaceholder"
+                        >
+                        <button @click="jumpToPatient" class="secondary-btn">{{ t.control.jump }}</button>
                     </div>
                     <div class="export-section">
-                         <button @click="exportResults" class="export-btn">📥 导出结果</button>
+                        <button @click="exportResults" class="export-btn">📥 {{ t.control.export }}</button>
                     </div>
                 </div>
-                 <p v-if="statusMessage" class="status-message" :class="statusClass">{{ statusMessage }}</p>
+                <p v-if="statusMessage" class="status-message" :class="statusClass">{{ statusMessage }}</p>
 
-                <!-- 病人信息 -->
-                <div class="patient-info card">
+                <!-- 病人信息 (Excel Mode) -->
+                <div v-if="mode === 'excel'" class="patient-info card">
                     <div class="patient-header">
-                        <h2><span class="icon">📋</span> 病人信息</h2>
+                        <h2><span class="icon">📋</span> {{ t.patient.title }}</h2>
                         <div class="barcode-info">
-                            <span class="barcode-label">条码号:</span>
+                            <span class="barcode-label">{{ t.patient.barcode }}:</span>
                             <span class="barcode-value">{{ currentPatient.barcode || 'N/A' }}</span>
                         </div>
                     </div>
                     <div class="findings-section">
-                        <h3>检查所见</h3>
+                        <h3>{{ t.patient.findings }}</h3>
                         <p class="findings">{{ currentPatient.findings || 'N/A' }}</p>
+                    </div>
+                </div>
+
+                <!-- Custom Input Card (Custom Mode) -->
+                <div v-if="mode === 'custom'" class="custom-input-card card">
+                    <h2><span class="icon">📝</span> {{ t.custom.title }}</h2>
+                    <textarea
+                        v-model="customFindings"
+                        :placeholder="t.custom.placeholder"
+                        rows="8"
+                        class="custom-textarea">
+                    </textarea>
+
+                    <div class="custom-history">
+                        <h3>{{ t.custom.history }}</h3>
+                        <select v-model="selectedCustomId" @change="loadCustomEvaluation" class="custom-select">
+                            <option value="">{{ t.custom.selectLoad }}</option>
+                            <option v-for="item in customHistory" :key="item.custom_id" :value="item.custom_id">
+                                {{ item.custom_id }} - {{ item.timestamp }}
+                            </option>
+                        </select>
                     </div>
                 </div>
 
                 <div class="main-content">
                     <!-- 评估区域 -->
                     <div class="assessment-container card">
-                        <h2><span class="icon">⭐</span> 医生评估</h2>
-                        
+                        <h2><span class="icon">⭐</span> {{ t.assessment.title }}</h2>
+
                         <div class="slider-group">
-                            <h3>AHA分型评估</h3>
+                            <h3>{{ t.assessment.ahaClassification }}</h3>
                             <div class="slider-item">
-                                <label>左侧评估: <span class="slider-value">{{ romanLabels[leftAssessment] }}</span></label>
-                                <input type="range" min="1" max="8" v-model.number="leftAssessment">
+                                <label>{{ t.assessment.leftSide }}: <span class="slider-value">{{ romanLabels[leftAssessment] }}</span></label>
+                                <div class="slider-wrapper">
+                                    <input type="range" min="1" max="8" v-model.number="leftAssessment">
+                                    <div class="slider-ticks aha-ticks">
+                                        <span v-for="n in 8" :key="n" class="tick" :class="{ active: leftAssessment === n }">{{ romanLabels[n] }}</span>
+                                    </div>
+                                </div>
                             </div>
                             <div class="slider-item">
-                                <label>右侧评估: <span class="slider-value">{{ romanLabels[rightAssessment] }}</span></label>
-                                <input type="range" min="1" max="8" v-model.number="rightAssessment">
+                                <label>{{ t.assessment.rightSide }}: <span class="slider-value">{{ romanLabels[rightAssessment] }}</span></label>
+                                <div class="slider-wrapper">
+                                    <input type="range" min="1" max="8" v-model.number="rightAssessment">
+                                    <div class="slider-ticks aha-ticks">
+                                        <span v-for="n in 8" :key="n" class="tick" :class="{ active: rightAssessment === n }">{{ romanLabels[n] }}</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                         <div class="slider-group">
-                            <h3>有用性评估</h3>
+                            <h3>{{ t.assessment.usefulness }}</h3>
                             <div class="slider-item">
-                                <label>左侧有用性: <span class="slider-value">{{ leftConsistency }}</span></label>
-                                <input type="range" min="0" max="5" v-model.number="leftConsistency">
+                                <label>{{ t.assessment.leftUsefulness }}: <span class="slider-value">{{ leftConsistency }}</span></label>
+                                <div class="slider-wrapper">
+                                    <input type="range" min="0" max="5" v-model.number="leftConsistency">
+                                    <div class="slider-ticks usefulness-ticks">
+                                        <span v-for="n in 6" :key="n-1" class="tick" :class="{ active: leftConsistency === (n-1) }">{{ n-1 }}</span>
+                                    </div>
+                                </div>
                             </div>
                             <div class="slider-item">
-                                <label>右侧有用性: <span class="slider-value">{{ rightConsistency }}</span></label>
-                                <input type="range" min="0" max="5" v-model.number="rightConsistency">
+                                <label>{{ t.assessment.rightUsefulness }}: <span class="slider-value">{{ rightConsistency }}</span></label>
+                                <div class="slider-wrapper">
+                                    <input type="range" min="0" max="5" v-model.number="rightConsistency">
+                                    <div class="slider-ticks usefulness-ticks">
+                                        <span v-for="n in 6" :key="n-1" class="tick" :class="{ active: rightConsistency === (n-1) }">{{ n-1 }}</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                         <div class="time-spent">
-                            当前用时: <strong>{{ getFormattedTime() }}</strong>
+                            {{ t.assessment.timeSpent }}: <strong>{{ getFormattedTime() }}</strong>
                         </div>
 
                         <div class="submission-status" v-if="hasSubmitted">
-                            <span class="status-badge">✅ 已提交</span>
+                            <span class="status-badge">✅ {{ t.assessment.submitted }}</span>
                         </div>
 
                         <div class="action-buttons">
-                            <button @click="submitEvaluation" class="submit-btn" :class="{ 'btn-highlight': !hasSubmitted }">
-                                {{ hasSubmitted ? '重新提交' : '提交' }}
+                            <button @click="mode === 'excel' ? submitEvaluation() : submitCustomEvaluation()" class="submit-btn" :class="{ 'btn-highlight': !hasSubmitted }">
+                                {{ hasSubmitted ? t.assessment.resubmit : t.assessment.submit }}
                             </button>
-                            <button @click="nextPatient" class="primary-btn" :disabled="!hasSubmitted">
-                                下一个病人 ➡️
+                            <button v-if="mode === 'excel'" @click="nextPatient" class="primary-btn" :disabled="!hasSubmitted">
+                                {{ t.assessment.nextPatient }} ➡️
+                            </button>
+                            <button v-if="mode === 'custom'" @click="clearCustomForm" class="secondary-btn">
+                                {{ t.custom.clearForm || '清空表单' }}
                             </button>
                         </div>
                     </div>
@@ -110,9 +186,9 @@
                     <!-- AI推理区域 -->
                     <div class="ai-container card">
                         <div class="ai-header">
-                            <h2><span class="icon">🤖</span> AI 推理</h2>
+                            <h2><span class="icon">🤖</span> {{ t.ai.title }}</h2>
                             <button @click="runAI" :disabled="aiLoading" class="ai-btn">
-                                {{ aiLoading ? '推理中...' : '启动AI分析' }}
+                                {{ aiLoading ? t.ai.loading : t.ai.start }}
                             </button>
                         </div>
                         <div v-if="aiLoading" class="loading-spinner"></div>
@@ -120,20 +196,20 @@
                         <!-- Formatted AI Result Display -->
                         <div v-if="aiResultParsed" class="ai-result-formatted">
                             <div class="inference-section">
-                                <h3>🧠 推理过程</h3>
+                                <h3>🧠 {{ t.ai.inference }}</h3>
                                 <p class="inference-text">{{ aiResultParsed.推理过程 }}</p>
                             </div>
 
                             <div v-if="aiResultParsed.AHA分型" class="aha-classification">
-                                <h3>📊 AHA分型结果</h3>
+                                <h3>📊 {{ t.ai.classification }}</h3>
                                 <div class="classification-grid">
                                     <div class="classification-item left">
-                                        <div class="label">左侧</div>
-                                        <div class="value">{{ aiResultParsed.AHA分型.左侧 || '无' }}</div>
+                                        <div class="label">{{ t.ai.leftSide }}</div>
+                                        <div class="value">{{ aiResultParsed.AHA分型.左侧 || t.ai.none }}</div>
                                     </div>
                                     <div class="classification-item right">
-                                        <div class="label">右侧</div>
-                                        <div class="value">{{ aiResultParsed.AHA分型.右侧 || '无' }}</div>
+                                        <div class="label">{{ t.ai.rightSide }}</div>
+                                        <div class="value">{{ aiResultParsed.AHA分型.右侧 || t.ai.none }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -145,7 +221,7 @@
                         </div>
 
                         <div v-else class="ai-placeholder">
-                            点击 "启动AI分析" 获取结果。
+                            {{ t.ai.placeholder }}
                         </div>
                     </div>
                 </div>
