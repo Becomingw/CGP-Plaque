@@ -1,7 +1,4 @@
 flask
 flask-cors
-pandas
-openpyxl
 openai
 pydantic
-waitress

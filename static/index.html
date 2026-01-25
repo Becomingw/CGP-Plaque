@@ -3,232 +3,303 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>医学影像AHA分型评估系统 | Medical Imaging AHA Classification System</title>
-    <link rel="stylesheet" href="static/css/style.css">
+    <title>MRI AHA Plaque Classification System | Live Demo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 <body>
     <div id="app">
-        <!-- Language Switcher -->
-        <div class="language-switcher">
-            <span class="lang-option" :class="{ active: language === 'zh' }" @click="switchLanguage('zh')">中文</span>
-            <span class="separator">|</span>
-            <span class="lang-option" :class="{ active: language === 'en' }" @click="switchLanguage('en')">EN</span>
-        </div>
-
-        <div class="container">
-            <header>
-                <h1><span class="icon">🏥</span> {{ t.title }}</h1>
-            </header>
-
-            <!-- Mode Toggle (shown after login) -->
-            <div v-if="loggedIn" class="mode-toggle">
-                <button
-                    :class="{'active': mode === 'excel'}"
-                    @click="switchMode('excel')"
-                    class="mode-btn">
-                    📊 {{ t.mode.excel }}
-                </button>
-                <button
-                    :class="{'active': mode === 'custom'}"
-                    @click="switchMode('custom')"
-                    class="mode-btn">
-                    ✏️ {{ t.mode.custom }}
-                </button>
-            </div>
-
-            <!-- 登录区域 -->
-            <div v-if="!loggedIn" class="login-container card">
-                <h2><span class="icon">👤</span> {{ t.login.title }}</h2>
-                <div class="form-group">
-                    <input
-                        type="text"
-                        v-model="username"
-                        @keyup.enter="login"
-                        :placeholder="t.login.placeholder"
-                    >
-                    <button @click="login" class="primary-btn">{{ t.login.button }}</button>
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="header-left">
+                    <h1 class="title">{{ t.title }}</h1>
+                    <p class="subtitle">{{ t.subtitle }}</p>
                 </div>
-                <p v-if="loginError" class="error-message">{{ loginError }}</p>
-            </div>
-
-            <!-- 主界面 -->
-            <main v-if="loggedIn">
-                <!-- 控制栏 -->
-                <div class="control-bar card">
-                    <div class="user-info">
-                        <span>{{ t.control.welcome }}, <strong>{{ username }}</strong>!</span>
-                    </div>
-                    <div v-if="mode === 'excel'" class="progress-info">
-                        <span>{{ t.control.progress }}: <strong>{{ patientIndex + 1 }} / {{ totalPatients }}</strong></span>
-                    </div>
-                    <div v-if="mode === 'excel'" class="search-bar">
-                        <input
-                            type="text"
-                            v-model="barcodeSearch"
-                            :placeholder="t.control.searchPlaceholder"
-                        >
-                        <button @click="jumpToPatient" class="secondary-btn">{{ t.control.jump }}</button>
-                    </div>
-                    <div class="export-section">
-                        <button @click="exportResults" class="export-btn">📥 {{ t.control.export }}</button>
-                    </div>
-                </div>
-                <p v-if="statusMessage" class="status-message" :class="statusClass">{{ statusMessage }}</p>
-
-                <!-- 病人信息 (Excel Mode) -->
-                <div v-if="mode === 'excel'" class="patient-info card">
-                    <div class="patient-header">
-                        <h2><span class="icon">📋</span> {{ t.patient.title }}</h2>
-                        <div class="barcode-info">
-                            <span class="barcode-label">{{ t.patient.barcode }}:</span>
-                            <span class="barcode-value">{{ currentPatient.barcode || 'N/A' }}</span>
+                <div class="header-right">
+                    <div class="switchers-row">
+                        <div class="language-switcher">
+                            <button
+                                class="lang-btn"
+                                :class="{ active: language === 'zh' }"
+                                @click="switchLanguage('zh')">
+                                中文
+                            </button>
+                            <span class="lang-divider">/</span>
+                            <button
+                                class="lang-btn"
+                                :class="{ active: language === 'en' }"
+                                @click="switchLanguage('en')">
+                                English
+                            </button>
+                        </div>
+                        <div class="version-switcher">
+                            <button
+                                class="version-btn"
+                                :class="{ active: promptVersion === 'NP' }"
+                                @click="switchPromptVersion('NP')">
+                                NP
+                            </button>
+                            <span class="version-divider">/</span>
+                            <button
+                                class="version-btn"
+                                :class="{ active: promptVersion === 'KGP' }"
+                                @click="switchPromptVersion('KGP')">
+                                KGP
+                            </button>
                         </div>
                     </div>
-                    <div class="findings-section">
-                        <h3>{{ t.patient.findings }}</h3>
-                        <p class="findings">{{ currentPatient.findings || 'N/A' }}</p>
-                    </div>
                 </div>
+            </div>
+        </header>
 
-                <!-- Custom Input Card (Custom Mode) -->
-                <div v-if="mode === 'custom'" class="custom-input-card card">
-                    <h2><span class="icon">📝</span> {{ t.custom.title }}</h2>
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Left Column: Input & Examples & Evaluation -->
+            <section class="input-section">
+                <!-- Custom Input (Top) -->
+                <div class="input-container">
+                    <div class="section-header">
+                        <h2 class="section-title">{{ t.input.title }}</h2>
+                    </div>
                     <textarea
-                        v-model="customFindings"
-                        :placeholder="t.custom.placeholder"
-                        rows="8"
-                        class="custom-textarea">
-                    </textarea>
+                        v-model="inputFindings"
+                        class="findings-textarea"
+                        :placeholder="t.input.placeholder"
+                        rows="5"
+                    ></textarea>
 
-                    <div class="custom-history">
-                        <h3>{{ t.custom.history }}</h3>
-                        <select v-model="selectedCustomId" @change="loadCustomEvaluation" class="custom-select">
-                            <option value="">{{ t.custom.selectLoad }}</option>
-                            <option v-for="item in customHistory" :key="item.custom_id" :value="item.custom_id">
-                                {{ item.custom_id }} - {{ item.timestamp }}
-                            </option>
-                        </select>
+                    <!-- Validation Error -->
+                    <div v-if="validationError" class="validation-error">
+                        <svg class="error-icon" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                        </svg>
+                        <span>{{ validationError }}</span>
+                    </div>
+
+                    <!-- Analyze Button -->
+                    <button
+                        @click="analyzeFindings"
+                        class="analyze-btn"
+                        :disabled="!inputFindings.trim() || isAnalyzing"
+                        :class="{ loading: isAnalyzing }">
+                        <span v-if="!isAnalyzing">{{ t.input.analyze }}</span>
+                        <span v-else class="loading-text">
+                            <svg class="spinner" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none" stroke-dasharray="31.416" stroke-dashoffset="31.416"/>
+                            </svg>
+                            {{ t.input.analyzing }}
+                        </span>
+                    </button>
+                </div>
+
+                <!-- Compact Examples Grid (Below Input) -->
+                <div class="examples-container compact">
+                    <div class="section-header">
+                        <h2 class="section-title">{{ t.examples.title }}</h2>
+                    </div>
+                    <div class="examples-grid compact">
+                        <button
+                            v-for="example in examples"
+                            :key="example.id"
+                            class="example-chip"
+                            :class="{ selected: selectedExampleId === example.id }"
+                            @click="selectExample(example)">
+                            {{ example.title }}
+                        </button>
                     </div>
                 </div>
 
-                <div class="main-content">
-                    <!-- 评估区域 -->
-                    <div class="assessment-container card">
-                        <h2><span class="icon">⭐</span> {{ t.assessment.title }}</h2>
+                <!-- Evaluation Section (Bottom) -->
+                <div class="evaluation-container" v-if="hasResults">
+                    <div class="section-header">
+                        <h2 class="section-title">{{ t.evaluation.title }}</h2>
+                        <p class="section-description">{{ t.evaluation.description }}</p>
+                    </div>
 
-                        <div class="slider-group">
-                            <h3>{{ t.assessment.ahaClassification }}</h3>
-                            <div class="slider-item">
-                                <label>{{ t.assessment.leftSide }}: <span class="slider-value">{{ romanLabels[leftAssessment] }}</span></label>
-                                <div class="slider-wrapper">
-                                    <input type="range" min="1" max="8" v-model.number="leftAssessment">
-                                    <div class="slider-ticks aha-ticks">
-                                        <span v-for="n in 8" :key="n" class="tick" :class="{ active: leftAssessment === n }">{{ romanLabels[n] }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="slider-item">
-                                <label>{{ t.assessment.rightSide }}: <span class="slider-value">{{ romanLabels[rightAssessment] }}</span></label>
-                                <div class="slider-wrapper">
-                                    <input type="range" min="1" max="8" v-model.number="rightAssessment">
-                                    <div class="slider-ticks aha-ticks">
-                                        <span v-for="n in 8" :key="n" class="tick" :class="{ active: rightAssessment === n }">{{ romanLabels[n] }}</span>
-                                    </div>
-                                </div>
-                            </div>
+                    <!-- Step 1: AHA Classification Scoring -->
+                    <div class="evaluation-step" :class="{ completed: evaluationStep >= 2, active: evaluationStep === 1 }">
+                        <div class="step-header">
+                            <span class="step-number">1</span>
+                            <span class="step-title">{{ t.evaluation.step1Title }}</span>
+                            <span v-if="evaluationStep >= 2" class="step-check">
+                                <svg viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                            </span>
                         </div>
 
-                        <div class="slider-group">
-                            <h3>{{ t.assessment.usefulness }}</h3>
-                            <div class="slider-item">
-                                <label>{{ t.assessment.leftUsefulness }}: <span class="slider-value">{{ leftConsistency }}</span></label>
-                                <div class="slider-wrapper">
-                                    <input type="range" min="0" max="5" v-model.number="leftConsistency">
-                                    <div class="slider-ticks usefulness-ticks">
-                                        <span v-for="n in 6" :key="n-1" class="tick" :class="{ active: leftConsistency === (n-1) }">{{ n-1 }}</span>
-                                    </div>
-                                </div>
+                        <div class="classification-inputs" v-if="evaluationStep === 1">
+                            <div class="input-group">
+                                <label>{{ t.evaluation.leftAHA }}</label>
+                                <select v-model="userAssessment.left">
+                                    <option v-for="type in ahaTypes" :key="type.value" :value="type.value">
+                                        {{ type.label }}
+                                    </option>
+                                </select>
                             </div>
-                            <div class="slider-item">
-                                <label>{{ t.assessment.rightUsefulness }}: <span class="slider-value">{{ rightConsistency }}</span></label>
-                                <div class="slider-wrapper">
-                                    <input type="range" min="0" max="5" v-model.number="rightConsistency">
-                                    <div class="slider-ticks usefulness-ticks">
-                                        <span v-for="n in 6" :key="n-1" class="tick" :class="{ active: rightConsistency === (n-1) }">{{ n-1 }}</span>
-                                    </div>
-                                </div>
+                            <div class="input-group">
+                                <label>{{ t.evaluation.rightAHA }}</label>
+                                <select v-model="userAssessment.right">
+                                    <option v-for="type in ahaTypes" :key="type.value" :value="type.value">
+                                        {{ type.label }}
+                                    </option>
+                                </select>
                             </div>
                         </div>
 
-                        <div class="time-spent">
-                            {{ t.assessment.timeSpent }}: <strong>{{ getFormattedTime() }}</strong>
-                        </div>
-
-                        <div class="submission-status" v-if="hasSubmitted">
-                            <span class="status-badge">✅ {{ t.assessment.submitted }}</span>
-                        </div>
-
-                        <div class="action-buttons">
-                            <button @click="mode === 'excel' ? submitEvaluation() : submitCustomEvaluation()" class="submit-btn" :class="{ 'btn-highlight': !hasSubmitted }">
-                                {{ hasSubmitted ? t.assessment.resubmit : t.assessment.submit }}
-                            </button>
-                            <button v-if="mode === 'excel'" @click="nextPatient" class="primary-btn" :disabled="!hasSubmitted">
-                                {{ t.assessment.nextPatient }} ➡️
-                            </button>
-                            <button v-if="mode === 'custom'" @click="clearCustomForm" class="secondary-btn">
-                                {{ t.custom.clearForm || '清空表单' }}
-                            </button>
+                        <div class="classification-summary" v-else>
+                            <span>{{ t.evaluation.left }}: {{ getAHALabel(userAssessment.left) }}</span>
+                            <span class="separator">|</span>
+                            <span>{{ t.evaluation.right }}: {{ getAHALabel(userAssessment.right) }}</span>
                         </div>
                     </div>
 
-                    <!-- AI推理区域 -->
-                    <div class="ai-container card">
-                        <div class="ai-header">
-                            <h2><span class="icon">🤖</span> {{ t.ai.title }}</h2>
-                            <button @click="runAI" :disabled="aiLoading" class="ai-btn">
-                                {{ aiLoading ? t.ai.loading : t.ai.start }}
-                            </button>
+                    <!-- Submit Classification Button -->
+                    <button
+                        v-if="evaluationStep === 1"
+                        @click="submitClassification"
+                        class="submit-step-btn"
+                        :disabled="!userAssessment.left || !userAssessment.right">
+                        {{ t.evaluation.submitClassification }}
+                    </button>
+
+                    <!-- Step 2: Usefulness Scoring (only visible after Step 1) -->
+                    <div class="evaluation-step" :class="{ active: evaluationStep === 2 }" v-if="evaluationStep >= 2">
+                        <div class="step-header">
+                            <span class="step-number">2</span>
+                            <span class="step-title">{{ t.evaluation.step2Title }}</span>
                         </div>
-                        <div v-if="aiLoading" class="loading-spinner"></div>
 
-                        <!-- Formatted AI Result Display -->
-                        <div v-if="aiResultParsed" class="ai-result-formatted">
-                            <div class="inference-section">
-                                <h3>🧠 {{ t.ai.inference }}</h3>
-                                <p class="inference-text">{{ aiResultParsed.推理过程 }}</p>
+                        <div class="usefulness-inputs">
+                            <div class="input-group">
+                                <label>{{ t.evaluation.leftUsefulness }}</label>
+                                <div class="rating-buttons">
+                                    <button
+                                        v-for="n in 5"
+                                        :key="n"
+                                        class="rating-btn"
+                                        :class="{ active: userAssessment.leftUsefulness === n }"
+                                        @click="userAssessment.leftUsefulness = n">
+                                        {{ n }}
+                                    </button>
+                                </div>
                             </div>
-
-                            <div v-if="aiResultParsed.AHA分型" class="aha-classification">
-                                <h3>📊 {{ t.ai.classification }}</h3>
-                                <div class="classification-grid">
-                                    <div class="classification-item left">
-                                        <div class="label">{{ t.ai.leftSide }}</div>
-                                        <div class="value">{{ aiResultParsed.AHA分型.左侧 || t.ai.none }}</div>
-                                    </div>
-                                    <div class="classification-item right">
-                                        <div class="label">{{ t.ai.rightSide }}</div>
-                                        <div class="value">{{ aiResultParsed.AHA分型.右侧 || t.ai.none }}</div>
-                                    </div>
+                            <div class="input-group">
+                                <label>{{ t.evaluation.rightUsefulness }}</label>
+                                <div class="rating-buttons">
+                                    <button
+                                        v-for="n in 5"
+                                        :key="n"
+                                        class="rating-btn"
+                                        :class="{ active: userAssessment.rightUsefulness === n }"
+                                        @click="userAssessment.rightUsefulness = n">
+                                        {{ n }}
+                                    </button>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Raw AI Result Display (fallback) -->
-                        <div v-else-if="aiResult && !aiResultParsed" class="ai-result-raw">
-                            <pre>{{ aiResult }}</pre>
+                    <!-- Final Submit Button -->
+                    <button
+                        v-if="evaluationStep === 2"
+                        @click="submitFinalEvaluation"
+                        class="submit-final-btn"
+                        :disabled="!userAssessment.leftUsefulness || !userAssessment.rightUsefulness || isSubmitting">
+                        <span v-if="!isSubmitting">{{ t.evaluation.submitFinal }}</span>
+                        <span v-else>{{ t.evaluation.submitting }}</span>
+                    </button>
+
+                    <!-- Submission Success Message -->
+                    <div v-if="submissionSuccess" class="submission-success">
+                        <svg viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        <span>{{ t.evaluation.success }}</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Column: Results Section -->
+            <section class="results-section">
+                <div class="results-container">
+                    <div class="section-header">
+                        <h2 class="section-title">{{ t.results.title }}</h2>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div v-if="!hasResults" class="empty-state">
+                        <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                        <p>{{ t.results.empty }}</p>
+                    </div>
+
+                    <!-- Results Content -->
+                    <div v-else class="results-content">
+                        <!-- AI AHA Classification Cards -->
+                        <div class="classification-grid">
+                            <div class="classification-card left">
+                                <div class="card-header">
+                                    <span class="card-label">{{ t.results.left }}</span>
+                                    <span class="card-sublabel">{{ t.results.aiResult }}</span>
+                                </div>
+                                <div class="card-value">{{ classification.left || t.results.none }}</div>
+                            </div>
+                            <div class="classification-card right">
+                                <div class="card-header">
+                                    <span class="card-label">{{ t.results.right }}</span>
+                                    <span class="card-sublabel">{{ t.results.aiResult }}</span>
+                                </div>
+                                <div class="card-value">{{ classification.right || t.results.none }}</div>
+                            </div>
                         </div>
 
-                        <div v-else class="ai-placeholder">
-                            {{ t.ai.placeholder }}
+                        <!-- Reasoning Process -->
+                        <div class="reasoning-section">
+                            <h3 class="subsection-title">{{ t.results.reasoning }}</h3>
+                            <div class="reasoning-content">
+                                {{ reasoning }}
+                            </div>
+                        </div>
+
+                        <!-- Raw Output Toggle -->
+                        <div class="raw-output-section">
+                            <button
+                                @click="showRawOutput = !showRawOutput"
+                                class="raw-toggle">
+                                <svg class="toggle-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 5l.01 0M10 12l.01 0M10 19l.01 0M5 5l.01 0M5 12l.01 0M5 19l.01 0M15 5l.01 0M15 12l.01 0M15 19l.01 0"/>
+                                </svg>
+                                {{ t.results.rawOutput }}
+                                <svg
+                                    class="chevron"
+                                    :class="{ expanded: showRawOutput }"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                                </svg>
+                            </button>
+                            <div v-if="showRawOutput" class="raw-output-content">
+                                <pre>{{ rawOutput }}</pre>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </main>
-        </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>{{ t.footer.text }}</p>
+        </footer>
     </div>
 
-    <script src="static/js/app.js"></script>
+    <script src="/static/js/app.js"></script>
 </body>
 </html>

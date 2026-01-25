@@ -1,220 +1,252 @@
-# AHA UI - 医学影像AHA分型评估系统
+---
+title: MRI AHA 斑块分型
+emoji: 🩺
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+pinned: false
+license: mit
+---
 
-基于美国心脏协会（AHA）斑块分型标准（I-VIII型）的MRI颈动脉斑块AI辅助分类Web界面。
+<div align="center">
 
-[English](README.md)
+# 基于知识引导的大语言模型实现颈动脉斑块改良AHA自动分型
 
-## 功能特点
+### 多中心验证研究
 
-- **双语界面**：完整的中英文支持，一键切换
-- **双输入模式**：Excel批量模式和自定义输入模式，灵活的数据录入方式
-- **AI辅助分类**：基于大语言模型的推理，输出结构化AHA分型结果
-- **多用户支持**：独立的用户进度跟踪，JSON持久化存储
-- **实时计时器**：记录每位患者的评估时间，便于工作流分析
-- **Excel导出**：导出所有评估结果（Excel模式和自定义模式）
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Docker](https://img.shields.io/badge/docker-enabled-blue.svg)](https://www.docker.com/)
 
-## 界面截图
+**[English](README.md)** ·
+**[在线演示](https://huggingface.co/spaces/your-space)** ·
+**[论文](#引用)**
 
-| 登录页面 | 病人信息（中文） | 病人信息（英文） |
-|:---:|:---:|:---:|
-| ![登录](fig/登陆.png) | ![病人信息中文](fig/病人信息中文.png) | ![病人信息英文](fig/病人信息英文.png) |
+</div>
 
-| 医生评估（中文） | 医生评估（英文） | 自定义输入模式 |
-|:---:|:---:|:---:|
-| ![评估中文](fig/推理中文.png) | ![评估英文](fig/推理英文.png) | ![自定义模式](fig/自定义信息.png) |
+---
 
-## 项目结构
+## 摘要
 
-```
-LLMAHA_Web/
-├── app.py                  # Flask后端应用
-├── run_production.py       # 生产环境服务器（Waitress WSGI）
-├── requirements.txt        # Python依赖
-├── api_config.json         # API配置文件（从示例创建）
-├── api_config_example.json # API配置模板
-├── prompt_9.md             # AI系统提示词（AHA分类）
-├── test200.xlsx            # 示例患者数据（Excel格式）
-├── static/
-│   ├── index.html          # 前端主页面
-│   ├── js/
-│   │   └── app.js          # Vue.js 3应用（含国际化）
-│   └── css/
-│       └── style.css       # UI样式
-├── user_data/              # 用户进度目录（自动创建）
-│   ├── {用户名}.json        # Excel模式评估进度
-│   └── {用户名}_custom.json # 自定义模式评估
-└── fig/                    # 文档截图
-```
+颈动脉粥样硬化斑块破裂是缺血性卒中的主要原因。基于高分辨率磁共振成像（HRMRI）的改良美国心脏协会（AHA）分型系统可实现超越狭窄程度的风险分层。然而，从自由文本报告中进行人工分型耗时且阅片者间一致性欠佳。
 
-## 部署指南
+我们提出**知识引导提示（KGP）**，将结构化分类标准嵌入LLM提示词中，实现准确的自动分类和可追溯的推理链。本多中心验证研究纳入了来自三家医疗中心的**433例患者（866条颈动脉）**。
 
-### 1. 环境要求
+<div align="center">
+
+![研究流程](fig/fig_1_pipeline.svg)
+
+**图1.** 研究设计和知识引导提示框架
+
+</div>
+
+---
+
+## 核心结果
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+### 六分类准确率
+
+| 模型 | 准确率 |
+|:------|:--------:|
+| DeepSeek-R1 (KGP) | **87.41%** |
+| Qwen3-235B-Instruct (KGP) | 85.57% |
+| GLM-4.5 (KGP) | 85.45% |
+| Qwen3-8B (KGP) | 81.52% |
+
+**Qwen3-8B** 在知识引导下从38.91%提升至**81.52%**（+42.6 pp）
+
+</td>
+<td width="50%" valign="top">
+
+### 二分类性能（AUC）
+
+| 任务 | 最佳模型 | AUC |
+|:-----|:-----------|:---:|
+| 显著斑块检测（III-VIII型） | GLM-4.5 | **0.992** |
+| VI型复杂斑块检测 | DeepSeek-R1 | **0.950** |
+
+</td>
+</tr>
+</table>
+
+### 临床验证（多阅片者研究，n=4名放射科医师）
+
+| 条件 | 准确率 | 加权κ |
+|:----------|:--------:|:----------:|
+| 无AI辅助 | 69.38% | 0.231 |
+| DeepSeek-R1辅助 | **90.00%** | **0.775** |
+
+- 初级医师：**+26 pp** 提升
+- 高级医师：**+15 pp** 提升
+
+<div align="center">
+
+![性能对比](fig/fig2_bar_chart.png)
+
+**图2.** 各模型六分类改良AHA分型性能对比
+
+</div>
+
+---
+
+## 方法学
+
+### 知识引导提示（KGP）
+
+KGP将结构化分类标准直接嵌入提示词中，引导LLM通过两步推理过程：
+
+**步骤1：信号到成分映射**
+- T1WI/T2WI信号模式 → 组织成分（脂质核心、纤维组织、钙化）
+- 形态学特征 → 表面特征（溃疡、血栓）
+- 强化模式 → 组织血管化和炎症
+
+**步骤2：成分到类型分配**
+- 基于主要病理特征综合识别的成分
+- 应用鉴别标准确定最终AHA分型
+
+该方法提供了一种轻量级的RAG替代方案，无需外部基础设施。
+
+---
+
+## 改良AHA分型
+
+| 类型 | 描述 | MRI特征 |
+|:----:|:------------|:--------------------|
+| **I-II** | 接近正常的管壁增厚 | 管壁厚度轻微增加 |
+| **III** | 弥漫性内膜增厚/小偏心性斑块 | 无脂质核心的早期斑块 |
+| **IV-V** | 含脂质/坏死核心的斑块 | T2WI低信号核心，无出血 |
+| **VI** | 伴出血/血栓的复杂斑块 | 表面破裂，斑块内出血（T1WI高信号） |
+| **VII** | 钙化斑块 | T1/T2极低信号（信号消失） |
+| **VIII** | 无脂质核心的纤维斑块 | T2WI等信号，均匀强化 |
+
+> **临床意义**：VI型（伴斑块内出血的复杂斑块）使缺血风险增加5-6倍。
+
+---
+
+## 安装部署
+
+### 环境要求
 
 - Python 3.8+
-- pip 包管理器
+- NVIDIA GPU（本地部署LLM时需要，可选）
 
-### 2. 克隆并安装依赖
+### 本地开发
 
 ```bash
-git clone <repository-url>
+# 克隆仓库
+git clone https://github.com/your-repo/LLMAHA_Web.git
 cd LLMAHA_Web
-uv pip install -r requirements.txt # 没有uv也可以就用pip
+
+# 安装依赖
+pip install -r requirements.txt
+
+# 配置API（复制并编辑）
+cp api_config.example.json api_config.json
+
+# 启动服务器
+python app.py
+# 服务器运行在 http://127.0.0.1:7860
 ```
 
-依赖包：
-- flask
-- flask-cors
-- pandas
-- openpyxl
-- openai
-- pydantic
-- waitress
-
-### 3. 配置API
-
-复制并编辑API配置文件：
+### Docker部署
 
 ```bash
-cp api_config_example.json api_config.json
+# 构建并运行
+docker build -t aha-classifier .
+docker run -p 7860:7860 \
+  -e API_KEY=your-api-key \
+  -e API_BASE_URL=https://api.example.com/v1 \
+  -e API_MODEL=model-name \
+  aha-classifier
 ```
 
-编辑 `api_config.json` 添加您的LLM API凭据：
+---
+
+## 环境变量配置
+
+| 变量 | 说明 | 默认值 |
+|:---------|:------------|:--------|
+| `API_KEY` | LLM API密钥 | - |
+| `API_BASE_URL` | API端点URL | - |
+| `API_MODEL` | 模型名称 | - |
+| `API_MAX_TOKENS` | 最大令牌数 | 4096 |
+| `API_TEMPERATURE` | 采样温度 | 0.1 |
+
+---
+
+## 本地LLM部署（vLLM）
+
+`deploy/` 目录包含使用vLLM在本地部署模型的Docker Compose配置：
+
+```
+deploy/
+├── qwen3_8b/           # Qwen3-8B（推荐用于效率优化）
+├── deepseek-r1/        # DeepSeek-R1（最高准确率）
+├── deepseek-v3/
+├── glm-4.5/
+├── qwen3_235b_instruct/
+├── qwen3_235b_thinking/
+└── ...
+```
+
+**本地部署Qwen3-8B：**
+
+```bash
+cd deploy/qwen3_8b
+
+# 配置环境变量
+export MODEL_DIR=/path/to/qwen3_8b_weights
+export VLLM_API_KEY=your-secret-key
+export CUDA_VISIBLE_DEVICES=0
+
+# 启动服务
+docker-compose up -d
+
+# 服务地址 http://localhost:9002
+```
+
+然后配置 `api_config.json`：
 
 ```json
 {
-  "api_configs": [
-    {
-      "name": "api名称",
-      "base_url": "https://api.example.com/v1",
-      "api_key": "您的API密钥",
-      "model": "模型名称",
-      "max_tokens": 2000,
-      "temperature": 0.3,
-      "timeout": 30,
-      "enabled": true
-    }
-  ],
-  "use_name": "api名称"
+  "api_configs": [{
+    "name": "qwen3-8b-local",
+    "base_url": "http://localhost:9002/v1",
+    "api_key": "your-secret-key",
+    "model": "qwen3_8b",
+    "enabled": true
+  }],
+  "use_name": "qwen3-8b-local"
 }
 ```
 
-**支持的API提供商：**
-- OpenAI / OpenAI兼容API
-- 硅基流动 (SiliconFlow)
-- DeepSeek
-- 本地LLM部署 (Ollama, vLLM等)
+---
 
-### 4. 准备数据文件
+## 在线演示
 
-将患者数据Excel文件放置在项目根目录。文件必须包含：
-- `条码号` 列：患者标识符
-- `检查所见` 列：MRI检查所见文本
+在Hugging Face Spaces上试用交互式演示：[演示链接](https://huggingface.co/spaces/your-space)
 
-默认文件路径：`test200.xlsx`
+---
 
-如需更改数据文件路径，请编辑 `app.py` 中的 `TABLE_PATH`（第147行）。
+## 引用
 
-### 5. 启动服务器
-
-**开发模式**（单线程，带调试）：
-```bash
-python app.py
-# 服务运行在 http://127.0.0.1:5001
+```bibtex
+@article{kgp-aha-2025,
+  title={Knowledge-Guided Large Language Models for Automated Modified AHA
+         Classification of Carotid Plaque from Free-Text MRI Reports:
+         A Multicenter Validation Study},
+  author={...},
+  journal={...},
+  year={2025}
+}
 ```
 
-**生产模式**（多线程，推荐）：
-```bash
-python run_production.py
-# 服务运行在 http://0.0.0.0:5001
-```
+---
 
-生产模式使用Waitress WSGI服务器：
-- 4个并发线程
-- 60秒通道超时（适应AI推理时间）
-- 可从网络访问（0.0.0.0）
+## 许可证
 
-## 使用教程
-
-### 步骤1：登录
-
-1. 打开浏览器访问 `http://localhost:5001`
-2. 输入用户名（任意字符串，用于进度跟踪）
-3. 点击"登录"按钮
-
-### 步骤2：选择输入模式
-
-- **Excel模式**：从Excel数据文件顺序加载患者
-- **自定义输入模式**：手动输入检查所见进行即时分析
-
-### 步骤3：查看患者信息
-
-在Excel模式下：
-- 查看当前患者的条码号和检查所见
-- 使用"上一个/下一个"按钮导航
-- 输入条码号可跳转到指定患者
-- 进度指示器显示当前位置（如"1/200"）
-
-### 步骤4：AI辅助分类
-
-1. 点击"启动AI分析"按钮
-2. 等待大语言模型分析检查所见
-3. 查看AI的推理过程和建议的AHA分型
-
-### 步骤5：医生评估
-
-1. 调整左右侧颈动脉的AHA分型滑块（I-VIII）
-2. 评价AI有用性（0-5分）
-3. 计时器自动记录当前患者的评估时间
-
-### 步骤6：提交并导航
-
-1. 点击"提交"保存评估结果
-2. 点击"下一个病人"继续下一例
-3. 进度自动保存到 `user_data/{用户名}.json`
-
-### 步骤7：导出结果
-
-点击"导出结果"下载Excel文件，包含：
-- 工作表1（Excel评估）：Excel模式评估及所有患者数据
-- 工作表2（自定义评估）：自定义模式评估记录（如有）
-
-## AHA分型参考
-
-| 分型 | 描述 | MRI特征 |
-|:---:|:---|:---|
-| I-II | 近正常管壁增厚 | 变化轻微 |
-| III | 弥漫性内膜增厚/小偏心斑块 | 早期斑块形成 |
-| IV-V | 含脂质/坏死核心斑块 | T2WI低信号，无出血 |
-| VI | 复杂斑块伴出血/血栓 | 表面缺损，斑块内出血 |
-| VII | 钙化斑块 | T1/T2极低信号 |
-| VIII | 无脂质核心的纤维斑块 | T2WI等信号，有强化 |
-
-## API接口
-
-| 接口 | 方法 | 描述 |
-|:---|:---:|:---|
-| `/api/login` | POST | 用户登录，加载Excel数据 |
-| `/api/patient/navigate` | POST | 导航到上/下一个患者 |
-| `/api/patient/jump` | POST | 跳转到指定条码号 |
-| `/api/submit` | POST | 提交评估（Excel模式） |
-| `/api/custom/submit` | POST | 提交评估（自定义模式） |
-| `/api/custom/list` | POST | 获取自定义评估列表 |
-| `/api/export` | POST | 导出结果到Excel |
-| `/api/infer` | POST | 调用AI进行分类 |
-| `/api/infer/test` | POST | 模拟AI响应（测试用） |
-| `/api/mode/switch` | POST | 切换Excel/自定义模式 |
-
-## 测试
-
-使用测试接口验证AI推理功能（不消耗API额度）：
-
-```bash
-curl -X POST http://localhost:5001/api/infer/test \
-  -H "Content-Type: application/json" \
-  -d '{"findings": "测试检查所见内容"}'
-```
-
-## 开源许可
-
-MIT License
-
+本项目采用 MIT 许可证。

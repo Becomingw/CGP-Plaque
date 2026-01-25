@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+  gpt_oss_120b:
+    image: ${IMAGE:-vllm/vllm-openai:v0.8.4}
+    container_name: gpt-oss-120b-model-server
+    restart: unless-stopped
+    gpus: all
+
+    ports:
+      - "${PORT:-9001}:9001"
+
+    shm_size: "${SHM_SIZE:-20gb}"
+    ipc: host
+
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES:-0}
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}
+
+    volumes:
+      - ${MODEL_DIR:-/data/models/openai-gpt-oss-120b}:/models:ro
+      - ${HF_CACHE_DIR:-./.hf_cache}:/root/.cache/huggingface
+
+    entrypoint:
+      - "vllm"
+      - "serve"
+      - "${MODEL_PATH:-/models}"
+      - "--served-model-name"
+      - "${SERVED_MODEL_NAME:-gpt_oss_120b}"
+      - "--trust-remote-code"
+      - "--tensor-parallel-size"
+      - "${TP_SIZE:-1}"
+      - "--port"
+      - "9001"
+      - "--max-model-len"
+      - "${MAX_MODEL_LEN:-8192}"
+      - "--api-key"
+      - "${VLLM_API_KEY:-REPLACE_WITH_YOUR_VLLM_API_KEY}"
+      - "--gpu-memory-utilization"
+      - "${GPU_MEMORY_UTILIZATION:-0.95}"
+

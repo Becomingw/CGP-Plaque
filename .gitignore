@@ -1,4 +1,28 @@
+# API configuration (contains secrets)
 api_config.json
+
+# User data
+user_data/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment
+.env
+.venv/
+venv/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test data
 test200.xlsx
 *E.md
-*.pyc

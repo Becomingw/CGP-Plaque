@@ -1,0 +1,43 @@
+version: "3.9"
+
+services:
+  gemma3:
+    image: ${IMAGE:-vllm/vllm-openai:v0.8.4}
+    container_name: medgemma3-model-server
+    restart: unless-stopped
+    gpus: all
+
+    ports:
+      - "${PORT:-9991}:9991"
+
+    shm_size: "${SHM_SIZE:-20gb}"
+    ipc: host
+
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES:-all}
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-2}
+
+    volumes:
+      - ${MODEL_DIR:-/data/truenas_B2/OpenSourceLLM/Medgemma3-27b}:/models:ro
+      - ${HF_CACHE_DIR:-./.hf_cache}:/root/.cache/huggingface
+
+    entrypoint:
+      - "vllm"
+      - "serve"
+      - "${MODEL_PATH:-/models}"
+      - "--served-model-name"
+      - "${SERVED_MODEL_NAME:-medgemma3_27b}"
+      - "--trust-remote-code"
+      - "--tensor-parallel-size"
+      - "${TP_SIZE:-1}"
+      - "--port"
+      - "9991"
+      - "--max-model-len"
+      - "${MAX_MODEL_LEN:-120000}"
+      - "--enable-prefix-caching"
+      - "--api-key"
+      - "${VLLM_API_KEY:-REPLACE_WITH_YOUR_VLLM_API_KEY}"
+      - "--gpu-memory-utilization"
+      - "${GPU_MEMORY_UTILIZATION:-0.95}"
+

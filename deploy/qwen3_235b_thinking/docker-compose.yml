@@ -1,0 +1,45 @@
+version: "3.9"
+
+services:
+  qwen3_235b_thinking:
+    image: ${IMAGE:-vllm/vllm-openai:v0.8.4}
+    container_name: qwen3-235b-thinking-model-server
+    restart: unless-stopped
+    gpus: all
+
+    ports:
+      - "${PORT:-9006}:9006"
+
+    shm_size: "${SHM_SIZE:-20gb}"
+    ipc: host
+
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES:-0,1,2,3,4,5,6,7}
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0,1,2,3,4,5,6,7}
+      - OMP_NUM_THREADS=${OMP_NUM_THREADS:-32}
+
+    volumes:
+      - ${MODEL_DIR:-/data/truenas_B2/OpenSourceLLM/Qwen3-235B-A22B-Thinking-2507}:/models:ro
+      - ${HF_CACHE_DIR:-./.hf_cache}:/root/.cache/huggingface
+
+    entrypoint:
+      - "vllm"
+      - "serve"
+      - "${MODEL_PATH:-/models}"
+      - "--served-model-name"
+      - "${SERVED_MODEL_NAME:-qwen3_235b_thinking}"
+      - "--trust-remote-code"
+      - "--tensor-parallel-size"
+      - "${TP_SIZE:-8}"
+      - "--port"
+      - "9006"
+      - "--max-model-len"
+      - "${MAX_MODEL_LEN:-10000}"
+      - "--api-key"
+      - "${VLLM_API_KEY:-REPLACE_WITH_YOUR_VLLM_API_KEY}"
+      - "--gpu-memory-utilization"
+      - "${GPU_MEMORY_UTILIZATION:-0.85}"
+      - "--reasoning-parser"
+      - "${REASONING_PARSER:-deepseek_r1}"
+

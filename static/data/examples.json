@@ -1,0 +1,59 @@
+{
+  "examples": [
+    {
+      "id": "case_001",
+      "zh": {
+        "title": "病例 1",
+        "findings": "左侧颈内动脉末端外侧壁-左侧颈内动脉起始部后壁管壁增厚伴斑块形成，呈TOF不均匀低信号，T1WI等、低信号，T2WI等、低信号，纤维帽光整，增强后未见强化，最狭窄处管腔狭窄约80%，右侧颈总动脉远端-颈内动脉起始部斑块形成，呈TOF低信号，T1WI稍高信号，局部见斑点状高信号；T2WI等高信号，纤维帽不光整，局部溃疡形成，增强后不均匀强化，局部强化明显，管腔狭窄约60%。余颅内动脉及其分支、双侧颈总动脉、颈内外动脉显示可，管壁毛糙，平扫及增强未见明显异常。"
+      },
+      "en": {
+        "title": "Case 1",
+        "findings": "Wall thickening with plaque formation at left internal carotid artery distal lateral wall to proximal posterior wall, showing heterogeneous hypointensity on TOF, iso/hypointense on T1WI, iso/hypointense on T2WI, intact fibrous cap, no enhancement after contrast, luminal stenosis approximately 80% at the narrowest point. Plaque formation at right common carotid artery distal to internal carotid artery origin, showing hypointensity on TOF, slightly hyperintense on T1WI with focal punctate hyperintensity; iso/hyperintense on T2WI, irregular fibrous cap with focal ulceration, heterogeneous enhancement with focal marked enhancement, luminal stenosis approximately 60%. Remaining intracranial arteries and branches, bilateral common carotid arteries, internal and external carotid arteries appear unremarkable with slightly irregular vessel walls, no obvious abnormality on plain and contrast-enhanced scans."
+      }
+    },
+    {
+      "id": "case_002",
+      "zh": {
+        "title": "病例 2",
+        "findings": "左侧颈内动脉C1段管壁增厚伴斑块形成，呈TOF高信号，T1WI等高信号，T2WI高信号，纤维帽欠光整，无溃疡形成，增强后无明显强化，管腔狭窄约80%；右侧颈内动脉C5段局部腹侧壁管壁增厚伴斑块形成，呈TOF等信号，T1WI等高信号，T2WI等信号，纤维帽光整，无溃疡形成，增强后轻度均匀强化，管腔狭窄约80%，基底动脉延长伴扩张，余颅内动脉及其分支、双侧颈总动脉、颈内外动脉显示可，管壁略毛糙，平扫及增强未见明显异常。附见：额颞顶叶可见斑点状DWI高信号，ADC低信号影。"
+      },
+      "en": {
+        "title": "Case 2",
+        "findings": "Wall thickening with plaque formation at left internal carotid artery C1 segment, showing hyperintensity on TOF, iso/hyperintense on T1WI, hyperintense on T2WI, slightly irregular fibrous cap, no ulceration, no obvious enhancement after contrast, luminal stenosis approximately 80%. Wall thickening with plaque formation at right internal carotid artery C5 segment focal ventral wall, showing isointensity on TOF, iso/hyperintense on T1WI, isointense on T2WI, intact fibrous cap, no ulceration, mild uniform enhancement after contrast, luminal stenosis approximately 80%. Basilar artery elongation with ectasia. Remaining intracranial arteries and branches, bilateral common carotid arteries, internal and external carotid arteries appear unremarkable with slightly irregular vessel walls, no obvious abnormality on plain and contrast-enhanced scans. Additional findings: Punctate DWI hyperintensity with ADC hypointensity in frontal, temporal, and parietal lobes."
+      }
+    },
+    {
+      "id": "case_003",
+      "zh": {
+        "title": "病例 3",
+        "findings": "左侧颈内动脉起始部右侧壁管壁增厚伴斑块形成，呈TOF低信号、内见点状低信号，T1WI等信号、内见点状低信号，T2WI低信号，纤维帽光整，增强后不强化，管腔狭窄约90%；右侧颈内动脉起始部背侧壁管壁增厚伴斑块形成，呈TOF等信号、边缘见条状低信号，T1WI稍高信号、边缘见条状低信号，T2WI等低信号、边缘见条状低信号，纤维帽不光整，有溃疡形成，增强后局部轻度点状强化，管腔狭窄约60%；余颅内动脉及其分支、双侧颈总动脉、颈内外动脉显示可，管壁略毛糙，平扫及增强未见明显异常。"
+      },
+      "en": {
+        "title": "Case 3",
+        "findings": "Wall thickening with plaque formation at left internal carotid artery origin right lateral wall, showing hypointensity on TOF with internal punctate hypointensity, isointense on T1WI with internal punctate hypointensity, hypointense on T2WI, intact fibrous cap, no enhancement after contrast, luminal stenosis approximately 90%. Wall thickening with plaque formation at right internal carotid artery origin dorsal wall, showing isointensity on TOF with marginal linear hypointensity, slightly hyperintense on T1WI with marginal linear hypointensity, iso/hypointense on T2WI with marginal linear hypointensity, irregular fibrous cap with ulceration, focal mild punctate enhancement after contrast, luminal stenosis approximately 60%. Remaining intracranial arteries and branches, bilateral common carotid arteries, internal and external carotid arteries appear unremarkable with slightly irregular vessel walls, no obvious abnormality on plain and contrast-enhanced scans."
+      }
+    },
+    {
+      "id": "case_004",
+      "zh": {
+        "title": "病例 4",
+        "findings": "双侧颈动脉管壁增厚，内膜毛糙，双侧颈总动脉及两侧颈内动脉内见斑块形成，增强扫描纤维帽强化。左侧可见3D-TOF、T1WI、T2WI均呈低信号，增强扫描未见明显强化；右侧颈内动脉局部纤维帽破裂，斑块内信号不均匀，局部3D-TOF、T1WI稍高信号、T2WI高信号，增强扫描局部轻度强化。双侧颈总动脉及两侧颈内动脉管腔重度狭窄，左侧明显。"
+      },
+      "en": {
+        "title": "Case 4",
+        "findings": "Bilateral carotid artery wall thickening with irregular intima. Plaque formation in bilateral common carotid arteries and internal carotid arteries, with fibrous cap enhancement on contrast-enhanced scan. Left side shows hypointensity on 3D-TOF, T1WI, and T2WI, no obvious enhancement on contrast scan. Right internal carotid artery shows focal fibrous cap rupture with heterogeneous signal within plaque, focal slight hyperintensity on 3D-TOF and T1WI, hyperintense on T2WI, with focal mild enhancement on contrast scan. Severe luminal stenosis of bilateral common carotid arteries and internal carotid arteries, more prominent on the left side."
+      }
+    },
+    {
+      "id": "case_005",
+      "zh": {
+        "title": "病例 5",
+        "findings": "CE-MRA及TOF-MRA示右侧颈内动脉显影浅淡；左侧颈动脉管壁局部管腔重度狭窄；右侧颈内动脉C4段局部管腔轻度度狭窄。血管壁成像示左侧颈内动脉C2段管壁增厚并见斑片状等T1高信号影，T2低信号，增强扫描呈明显强化，伴局部管腔中重度狭窄；右侧颈动脉管壁见斑片状等T1信号影，T2低信号，纤维帽形成，表面不光整，增强扫描呈中度强化，伴局部管腔重度狭窄；"
+      },
+      "en": {
+        "title": "Case 5",
+        "findings": "CE-MRA and TOF-MRA show faint opacification of right internal carotid artery; severe focal luminal stenosis of left carotid artery wall; mild focal luminal stenosis of right internal carotid artery C4 segment. Vessel wall imaging shows wall thickening at left internal carotid artery C2 segment with patchy iso/hyperintense signal on T1, hypointense on T2, marked enhancement on contrast scan, with focal moderate to severe luminal stenosis. Right carotid artery wall shows patchy isointense signal on T1, hypointense on T2, fibrous cap formation with irregular surface, moderate enhancement on contrast scan, with focal severe luminal stenosis."
+      }
+    }
+  ]
+}

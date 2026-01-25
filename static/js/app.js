@@ -1,149 +1,117 @@
 const { createApp } = Vue;
 
-// i18n Translations
+// Bilingual translations
 const translations = {
     zh: {
-        title: '医学影像AHA分型评估系统',
-        login: {
-            title: '用户登录',
-            placeholder: '请输入您的用户名',
-            button: '登录'
+        title: 'MRI AHA 斑块分型评估系统',
+        subtitle: '基于深度学习的高分辨率颈动脉斑块分析 | Live Demo',
+        examples: {
+            title: '示例病例'
         },
-        mode: {
-            excel: 'Excel模式',
-            custom: '自定义输入模式',
-            switchConfirm: '切换模式将清空当前未保存的内容，确定继续吗？'
+        input: {
+            title: '影像检查所见',
+            placeholder: '请输入颈动脉 HRMRI 检查所见描述，包括 T1WI、T2WI、TOF 等序列的信号表现...',
+            analyze: '开始分析',
+            analyzing: '分析中...'
         },
-        control: {
-            welcome: '欢迎',
-            progress: '进度',
-            searchPlaceholder: '按条码号跳转',
-            jump: '跳转',
-            export: '导出结果'
+        evaluation: {
+            title: '评估打分',
+            description: '请完成以下两步评估：先进行 AHA 分型打分，提交后再进行有用性评分',
+            step1Title: 'AHA 分型打分',
+            step2Title: 'AI 结果有用性评分',
+            leftAHA: '左侧 AHA 分型',
+            rightAHA: '右侧 AHA 分型',
+            leftUsefulness: '左侧 AI 结果有用性 (1-5)',
+            rightUsefulness: '右侧 AI 结果有用性 (1-5)',
+            submitClassification: '提交分型打分',
+            submitFinal: '提交完整评估',
+            submitting: '提交中...',
+            success: '评估已成功提交',
+            left: '左侧',
+            right: '右侧'
         },
-        patient: {
-            title: '病人信息',
-            barcode: '条码号',
-            findings: '检查所见'
-        },
-        custom: {
-            title: '自定义检查所见',
-            placeholder: '请输入检查所见内容...',
-            history: '历史自定义评估',
-            selectLoad: '-- 选择加载 --',
-            submitSuccess: '✅ 自定义评估已保存: {id}',
-            emptyFindings: '请先输入检查所见内容',
-            clearForm: '清空表单'
-        },
-        assessment: {
-            title: '医生评估',
-            ahaClassification: 'AHA分型评估',
-            leftSide: '左侧评估',
-            rightSide: '右侧评估',
-            usefulness: '有用性评估',
-            leftUsefulness: '左侧有用性',
-            rightUsefulness: '右侧有用性',
-            timeSpent: '当前用时',
-            submitted: '已提交',
-            submit: '提交',
-            resubmit: '重新提交',
-            nextPatient: '下一个病人'
-        },
-        ai: {
-            title: 'AI 推理',
-            start: '启动AI分析',
-            loading: '推理中...',
-            inference: '推理过程',
-            classification: 'AHA分型结果',
-            leftSide: '左侧',
-            rightSide: '右侧',
+        results: {
+            title: 'AI 分析结果',
+            empty: '请输入检查所见并点击"开始分析"',
+            left: '左侧颈动脉',
+            right: '右侧颈动脉',
             none: '无',
-            placeholder: '点击 "启动AI分析" 获取结果。'
+            reasoning: '推理过程',
+            rawOutput: '原始 AI 输出',
+            aiResult: 'AI 结果'
         },
-        messages: {
-            loginSuccess: '登录成功,已加载用户 {username} 的进度。',
-            submitSuccess: '✅ 提交成功！用时: {time}秒',
-            submitWarning: '⚠️ 请先提交当前病人的评估！',
-            submitBeforeJump: '⚠️ 请先提交当前病人的评估再跳转！',
-            jumpSuccess: '已成功跳转到条码号: {barcode}',
-            nextPatient: '已加载下一位病人。',
-            exportStart: '正在生成导出文件...',
-            exportSuccess: '文件已开始下载。',
-            noFindings: '当前病人没有检查所见信息。',
-            enterBarcode: '请输入要跳转的条码号。',
-            emptyUsername: '用户名不能为空'
+        footer: {
+            text: 'MRI AHA Plaque Classification System | Academic Live Demo | Powered by Deep Learning'
+        },
+        validation: {
+            empty: '输入为空',
+            invalid: '无效预测，请检查输入为正确的HRMRI影像描述'
+        },
+        ahaTypes: {
+            'I': 'Type I',
+            'II': 'Type II',
+            'III': 'Type III',
+            'IV': 'Type IV',
+            'V': 'Type V',
+            'VI': 'Type VI',
+            'VII': 'Type VII',
+            'VIII': 'Type VIII'
         }
     },
     en: {
-        title: 'Medical Imaging AHA Classification System',
-        login: {
-            title: 'User Login',
-            placeholder: 'Enter your username',
-            button: 'Login'
+        title: 'MRI AHA Plaque Classification System',
+        subtitle: 'Deep Learning-based High-Resolution Carotid Plaque Analysis | Live Demo',
+        examples: {
+            title: 'Example Cases'
         },
-        mode: {
-            excel: 'Excel Mode',
-            custom: 'Custom Input Mode',
-            switchConfirm: 'Switching modes will clear unsaved content. Continue?'
+        input: {
+            title: 'Imaging Findings',
+            placeholder: 'Enter carotid HRMRI examination findings, including signal characteristics on T1WI, T2WI, TOF sequences...',
+            analyze: 'Analyze',
+            analyzing: 'Analyzing...'
         },
-        control: {
-            welcome: 'Welcome',
-            progress: 'Progress',
-            searchPlaceholder: 'Jump to barcode',
-            jump: 'Jump',
-            export: 'Export Results'
+        evaluation: {
+            title: 'Evaluation Scoring',
+            description: 'Complete the two-step evaluation: First provide AHA classification scores, then rate usefulness',
+            step1Title: 'AHA Classification Scoring',
+            step2Title: 'AI Result Usefulness Rating',
+            leftAHA: 'Left AHA Type',
+            rightAHA: 'Right AHA Type',
+            leftUsefulness: 'Left AI Usefulness (1-5)',
+            rightUsefulness: 'Right AI Usefulness (1-5)',
+            submitClassification: 'Submit Classification',
+            submitFinal: 'Submit Complete Evaluation',
+            submitting: 'Submitting...',
+            success: 'Evaluation submitted successfully',
+            left: 'Left',
+            right: 'Right'
         },
-        patient: {
-            title: 'Patient Information',
-            barcode: 'Barcode',
-            findings: 'Examination Findings'
-        },
-        custom: {
-            title: 'Custom Examination Findings',
-            placeholder: 'Enter examination findings here...',
-            history: 'Custom Evaluation History',
-            selectLoad: '-- Select to load --',
-            submitSuccess: '✅ Custom evaluation saved: {id}',
-            emptyFindings: 'Please enter examination findings first',
-            clearForm: 'Clear Form'
-        },
-        assessment: {
-            title: 'Doctor Assessment',
-            ahaClassification: 'AHA Classification',
-            leftSide: 'Left Side',
-            rightSide: 'Right Side',
-            usefulness: 'Usefulness Assessment',
-            leftUsefulness: 'Left Usefulness',
-            rightUsefulness: 'Right Usefulness',
-            timeSpent: 'Time Spent',
-            submitted: 'Submitted',
-            submit: 'Submit',
-            resubmit: 'Resubmit',
-            nextPatient: 'Next Patient'
-        },
-        ai: {
-            title: 'AI Inference',
-            start: 'Start AI Analysis',
-            loading: 'Analyzing...',
-            inference: 'Inference Process',
-            classification: 'AHA Classification Results',
-            leftSide: 'Left',
-            rightSide: 'Right',
+        results: {
+            title: 'AI Analysis Results',
+            empty: 'Enter examination findings and click "Analyze"',
+            left: 'Left Carotid',
+            right: 'Right Carotid',
             none: 'None',
-            placeholder: 'Click "Start AI Analysis" to get results.'
+            reasoning: 'Reasoning Process',
+            rawOutput: 'Raw AI Output',
+            aiResult: 'AI Result'
         },
-        messages: {
-            loginSuccess: 'Login successful, user {username} progress loaded.',
-            submitSuccess: '✅ Submitted successfully! Time: {time}s',
-            submitWarning: '⚠️ Please submit the current patient assessment first!',
-            submitBeforeJump: '⚠️ Please submit current assessment before jumping!',
-            jumpSuccess: 'Successfully jumped to barcode: {barcode}',
-            nextPatient: 'Next patient loaded.',
-            exportStart: 'Generating export file...',
-            exportSuccess: 'File download started.',
-            noFindings: 'Current patient has no examination findings.',
-            enterBarcode: 'Please enter a barcode to jump to.',
-            emptyUsername: 'Username cannot be empty'
+        footer: {
+            text: 'MRI AHA Plaque Classification System | Academic Live Demo | Powered by Deep Learning'
+        },
+        validation: {
+            empty: 'Input is empty',
+            invalid: 'Invalid prediction, please check input is correct HRMRI imaging description'
+        },
+        ahaTypes: {
+            'I': 'Type I',
+            'II': 'Type II',
+            'III': 'Type III',
+            'IV': 'Type IV',
+            'V': 'Type V',
+            'VI': 'Type VI',
+            'VII': 'Type VII',
+            'VIII': 'Type VIII'
         }
     }
 };
@@ -154,445 +122,328 @@ createApp({
             // Language
             language: localStorage.getItem('language') || 'zh',
 
-            // State
-            loggedIn: false,
-            username: '',
-            loginError: '',
-            statusMessage: '',
-            statusClass: '',
+            // Prompt Version
+            promptVersion: localStorage.getItem('promptVersion') || 'NP',
 
-            // Mode
-            mode: 'excel',  // 'excel' or 'custom'
+            // Examples
+            examples: [],
+            selectedExampleId: null,
 
-            // Patient Data
-            patientIndex: 0,
-            totalPatients: 0,
-            currentPatient: {},
+            // Input
+            inputFindings: '',
+            validationError: '',
 
-            // Custom Mode
-            customFindings: '',
-            customHistory: [],
-            selectedCustomId: null,
+            // Analysis state
+            isAnalyzing: false,
+            hasResults: false,
+            classification: { left: '', right: '' },
+            reasoning: '',
+            rawOutput: '',
+            showRawOutput: false,
 
-            // Assessment
-            leftAssessment: 1,
-            rightAssessment: 1,
-            leftConsistency: 0,
-            rightConsistency: 0,
-            timeSpent: 0,
+            // Evaluation state
+            evaluationStep: 1, // 1: classification, 2: usefulness
+            userAssessment: {
+                left: 'I',
+                right: 'I',
+                leftUsefulness: null,
+                rightUsefulness: null
+            },
+            isSubmitting: false,
+            submissionSuccess: false,
 
-            // Submission tracking
-            hasSubmitted: false,
-            hasModified: false,
-
-            // Timer
-            startTime: null,
-            currentTime: 0,
-            timerInterval: null,
-
-            // UI
-            barcodeSearch: '',
-            romanLabels: { 1: 'I', 2: 'II', 3: 'III', 4: 'IV', 5: 'V', 6: 'VI', 7: 'VII', 8: 'VIII' },
-
-            // AI
-            aiLoading: false,
-            aiResult: '',
-            aiResultParsed: null
+            // Username for evaluation (stored in localStorage)
+            username: localStorage.getItem('evaluationUsername') || 'demo_user_' + Math.random().toString(36).slice(2, 11)
         };
     },
     computed: {
         t() {
             return translations[this.language];
+        },
+        ahaTypes() {
+            return Object.entries(this.t.ahaTypes).map(([value, label]) => ({ value, label }));
         }
     },
     methods: {
-        // --- Language Switching ---
+        // Language switching
         switchLanguage(lang) {
             this.language = lang;
             localStorage.setItem('language', lang);
             document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+            this.selectedExampleId = null;
+            this.loadExamples();
+            this.clearResults();
         },
 
-        // --- Translation Helper ---
-        translate(key, params = {}) {
-            let text = this.t.messages[key] || key;
-            Object.keys(params).forEach(param => {
-                text = text.replace(`{${param}}`, params[param]);
-            });
-            return text;
+        // Prompt version switching
+        switchPromptVersion(version) {
+            this.promptVersion = version;
+            localStorage.setItem('promptVersion', version);
+            this.selectedExampleId = null;
+            this.clearResults();
         },
 
-        // --- API Calls ---
-        async apiCall(endpoint, method = 'POST', body = {}) {
+        // Get AHA label by value
+        getAHALabel(value) {
+            return this.t.ahaTypes[value] || value;
+        },
+
+        // Load examples from API
+        async loadExamples() {
             try {
-                const response = await axios({
-                    method: method,
-                    url: `http://127.0.0.1:5001/api/${endpoint}`,
-                    data: body,
-                    responseType: endpoint === 'export' ? 'blob' : 'json'
-                });
-                return response.data;
+                const response = await axios.get(`/api/examples?lang=${this.language}`);
+                this.examples = response.data.examples;
             } catch (error) {
-                const errorMessage = error.response?.data?.error || error.message || 'Unknown error';
-                this.showStatus(errorMessage, 'error');
-                throw new Error(errorMessage);
+                console.error('Failed to load examples:', error);
+                // Fallback to hardcoded examples if API fails
+                this.loadFallbackExamples();
             }
         },
 
-        // --- Authentication ---
-        async login() {
-            if (!this.username.trim()) {
-                this.loginError = this.translate('emptyUsername');
-                return;
-            }
-            this.loginError = '';
-            try {
-                const data = await this.apiCall('login', 'POST', { username: this.username });
-                this.updatePatientData(data);
-                this.loggedIn = true;
-                this.showStatus(this.translate('loginSuccess', { username: this.username }), 'success');
-            } catch (error) {
-                // error is already displayed by apiCall
-            }
+        // Fallback examples (in case API fails)
+        loadFallbackExamples() {
+            this.examples = [
+                {
+                    id: 'case_001',
+                    title: this.language === 'zh' ? '病例 1: 双侧颈动脉粥样硬化斑块' : 'Case 1: Bilateral carotid atherosclerotic plaques',
+                    findings: this.language === 'zh' ?
+                        '双侧颈动脉可见斑块形成。左侧颈动脉斑块T1WI呈等信号，T2WI呈低信号，TOF呈等信号，增强扫描周边可见环形强化，提示脂质核心伴纤维帽。右侧颈动脉斑块T1WI、T2WI均呈明显低信号，提示钙化。' :
+                        'Bilateral carotid arteries show plaque formation. Left carotid plaque: T1WI isointense, T2WI hypointense, TOF isointense, with peripheral enhancement on contrast-enhanced scan, suggesting lipid core with fibrous cap. Right carotid plaque: T1WI and T2WI both show marked hypointensity, suggesting calcification.'
+                },
+                {
+                    id: 'case_002',
+                    title: this.language === 'zh' ? '病例 2: 左侧颈动脉复杂斑块伴出血' : 'Case 2: Left carotid complex plaque with hemorrhage',
+                    findings: this.language === 'zh' ?
+                        '左侧颈动脉分叉处可见一偏心性斑块，T1WI呈高信号，T2WI信号不均，TOF呈高信号，斑块内见不规则高信号区，增强扫描显示纤维帽不完整，斑块表面可见溃疡形成。右侧颈动脉壁弥漫性增厚，无明显狭窄。' :
+                        'Eccentric plaque at left carotid bifurcation: T1WI hyperintense, T2WI heterogeneous signal, TOF hyperintense, with irregular hyperintense area within plaque. Contrast-enhanced scan shows incomplete fibrous cap with surface ulceration. Right carotid artery shows diffuse wall thickening without significant stenosis.'
+                },
+                {
+                    id: 'case_003',
+                    title: this.language === 'zh' ? '病例 3: 右侧颈动脉纤维性斑块' : 'Case 3: Right carotid fibrous plaque',
+                    findings: this.language === 'zh' ?
+                        '右侧颈动脉可见斑块形成，T1WI呈等信号，T2WI呈等信号，TOF呈等信号，增强扫描可见明显均匀强化，无明显脂质核心或出血征象，纤维帽完整。左侧颈动脉未见明显异常。' :
+                        'Right carotid artery shows plaque formation. T1WI isointense, T2WI isointense, TOF isointense. Contrast-enhanced scan shows marked homogeneous enhancement. No obvious lipid core or hemorrhage, with intact fibrous cap. Left carotid artery shows no significant abnormality.'
+                },
+                {
+                    id: 'case_004',
+                    title: this.language === 'zh' ? '病例 4: 双侧颈动脉术后改变' : 'Case 4: Post-operative bilateral carotid changes',
+                    findings: this.language === 'zh' ?
+                        '双侧颈动脉内膜剥脱术后改变。左侧颈动脉管腔通畅，管壁轻度增厚，未见明确斑块复发。右侧颈动脉支架植入术后，支架内通畅，未见内膜增生或再狭窄。' :
+                        'Status post bilateral carotid endarterectomy. Left carotid lumen is patent with mild wall thickening, no definite plaque recurrence. Right carotid artery stent placed, stent lumen patent, no intimal hyperplasia or restenosis.'
+                },
+                {
+                    id: 'case_005',
+                    title: this.language === 'zh' ? '病例 5: 左侧近正常壁厚，右侧III型病变' : 'Case 5: Left near-normal wall, Right Type III lesion',
+                    findings: this.language === 'zh' ?
+                        '左侧颈动脉管壁厚度接近正常，无明显钙化。右侧颈动脉可见弥漫性内膜增厚或小的偏心性非钙化斑块，管腔轻度狭窄约30%，T1WI、T2WI信号均接近正常血管壁。' :
+                        'Left carotid artery wall thickness is near-normal without calcification. Right carotid artery shows diffuse intimal thickening or small eccentric non-calcified plaque with mild stenosis (~30%). T1WI and T2WI signals are similar to normal vessel wall.'
+                }
+            ];
         },
 
-        // --- Data Handling ---
-        updatePatientData(data) {
-            this.currentPatient = {
-                barcode: data.barcode,
-                findings: data.findings
+        // Select an example
+        selectExample(example) {
+            this.selectedExampleId = example.id;
+            this.inputFindings = example.findings;
+            this.validationError = '';
+            this.clearResults();
+        },
+
+        // Clear results
+        clearResults() {
+            this.hasResults = false;
+            this.classification = { left: '', right: '' };
+            this.reasoning = '';
+            this.rawOutput = '';
+            this.showRawOutput = false;
+            this.evaluationStep = 1;
+            this.userAssessment = {
+                left: 'I',
+                right: 'I',
+                leftUsefulness: null,
+                rightUsefulness: null
             };
-            this.patientIndex = data.index;
-            this.totalPatients = data.total;
-
-            // Set sliders to loaded values
-            this.leftAssessment = data.labels.left_assessment;
-            this.rightAssessment = data.labels.right_assessment;
-            this.leftConsistency = data.labels.left_usefulness;
-            this.rightConsistency = data.labels.right_usefulness;
-            this.timeSpent = data.labels.time_spent || 0;
-
-            // Reset submission status
-            this.hasSubmitted = false;
-            this.hasModified = false;
-
-            // Reset AI result for new patient
-            this.aiResult = '';
-            this.aiResultParsed = null;
-
-            // Start the timer
-            this.startTimer();
+            this.submissionSuccess = false;
         },
 
-        // --- Timer Functions ---
-        startTimer() {
-            // Clear any existing timer
-            if (this.timerInterval) {
-                clearInterval(this.timerInterval);
-            }
+        // Analyze findings
+        async analyzeFindings() {
+            // Clear previous error
+            this.validationError = '';
+            this.submissionSuccess = false;
 
-            // Set start time
-            this.startTime = Date.now();
-            this.currentTime = 0;
-
-            // Update timer every 100ms for smooth display
-            this.timerInterval = setInterval(() => {
-                this.currentTime = (Date.now() - this.startTime) / 1000;
-            }, 100);
-        },
-
-        stopTimer() {
-            if (this.timerInterval) {
-                clearInterval(this.timerInterval);
-                this.timerInterval = null;
-            }
-        },
-
-        getFormattedTime() {
-            const seconds = Math.floor(this.currentTime);
-            const minutes = Math.floor(seconds / 60);
-            const remainingSeconds = seconds % 60;
-            return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-        },
-
-        // --- Navigation ---
-        async nextPatient() {
-            // 检查是否已提交
-            if (!this.hasSubmitted) {
-                this.showStatus(this.translate('submitWarning'), 'error');
+            // Validate input
+            if (!this.inputFindings.trim()) {
+                this.validationError = this.t.validation.empty;
                 return;
             }
 
-            try {
-                const data = await this.apiCall('patient/navigate', 'POST', { username: this.username, direction: 'next' });
-                this.updatePatientData(data);
-                this.showStatus(this.translate('nextPatient'), 'success');
-            } catch (error) {
-                // error message is shown by apiCall
-            }
-        },
-
-        async jumpToPatient() {
-            if (!this.barcodeSearch.trim()) {
-                this.showStatus(this.translate('enterBarcode'), 'error');
-                return;
-            }
-
-            // 检查是否已提交
-            if (!this.hasSubmitted) {
-                this.showStatus(this.translate('submitBeforeJump'), 'error');
-                return;
-            }
+            this.isAnalyzing = true;
+            this.clearResults();
 
             try {
-                const data = await this.apiCall('patient/jump', 'POST', { username: this.username, barcode: this.barcodeSearch });
-                this.updatePatientData(data);
-                this.showStatus(this.translate('jumpSuccess', { barcode: this.barcodeSearch }), 'success');
-                this.barcodeSearch = '';
-            } catch (error) {
-                // error message is shown by apiCall
-            }
-        },
+                const response = await axios.post('/api/infer', {
+                    findings: this.inputFindings,
+                    language: this.language,
+                    prompt_version: this.promptVersion
+                });
 
-        // --- Actions ---
-        async submitEvaluation() {
-            try {
-                const payload = {
-                    username: this.username,
-                    labels: {
-                        left_assessment: this.leftAssessment,
-                        right_assessment: this.rightAssessment,
-                        left_usefulness: this.leftConsistency,
-                        right_usefulness: this.rightConsistency,
-                    }
-                };
-                const response = await this.apiCall('submit', 'POST', payload);
-                this.timeSpent = response.time_spent;
-                this.hasSubmitted = true;
-                this.hasModified = false;
-                this.showStatus(this.translate('submitSuccess', { time: response.time_spent.toFixed(2) }), 'success');
-            } catch (error) {
-                // error message is shown by apiCall
-            }
-        },
+                if (response.data.error) {
+                    this.validationError = response.data.error;
+                    return;
+                }
 
-        async exportResults() {
-            try {
-                this.showStatus(this.translate('exportStart'), 'success');
-                const blob = await this.apiCall('export', 'POST', { username: this.username });
-                const url = window.URL.createObjectURL(new Blob([blob]));
-                const link = document.createElement('a');
-                link.href = url;
-                const filename = `${this.username}_export_${Date.now()}.xlsx`;
-                link.setAttribute('download', filename);
-                document.body.appendChild(link);
-                link.click();
-                link.remove();
-                this.showStatus(this.translate('exportSuccess'), 'success');
-            } catch (error) {
-                // error message is shown by apiCall
-            }
-        },
+                // Store raw output
+                this.rawOutput = response.data.result || '';
 
-        async runAI() {
-            const findings = this.mode === 'excel'
-                ? this.currentPatient.findings
-                : this.customFindings;
+                // Parse structured data if available
+                if (response.data.validated && response.data.data) {
+                    const data = response.data.data;
 
-            if (!findings || !findings.trim()) {
-                this.showStatus(
-                    this.mode === 'excel'
-                        ? this.translate('noFindings')
-                        : this.t.custom.emptyFindings,
-                    'error'
-                );
-                return;
-            }
-
-            this.aiLoading = true;
-            this.aiResult = '';
-            this.aiResultParsed = null;
-            try {
-                const res = await this.apiCall('infer', 'POST', { findings: findings });
-                if (res.error) throw new Error(res.error);
-
-                // backend returns { result: '...', validated: bool, data: {...} }
-                this.aiResult = res.result || '';
-
-                // If backend successfully validated the response, use the validated data
-                if (res.validated && res.data) {
-                    this.aiResultParsed = res.data;
-
-                    // Show warning if there was partial recovery
-                    if (res.warning) {
-                        console.warn('AI响应验证警告:', res.warning);
-                    }
-                } else {
-                    // Backend validation failed, try client-side parsing as fallback
-                    console.warn('后端验证失败，尝试前端解析:', res.error);
-
-                    try {
-                        this.aiResultParsed = JSON.parse(this.aiResult);
-                    } catch (e) {
-                        // If not valid JSON, try to extract JSON from markdown code blocks
-                        const jsonMatch = this.aiResult.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
-                        if (jsonMatch) {
-                            try {
-                                this.aiResultParsed = JSON.parse(jsonMatch[1]);
-                            } catch (e2) {
-                                // Failed to parse, will display raw result
-                                console.warn('前端JSON解析也失败，显示原始文本');
-                            }
+                    // Map keys based on language
+                    if (this.language === 'zh') {
+                        this.reasoning = data['推理过程'] || '';
+                        if (data['AHA分型']) {
+                            this.classification.left = data['AHA分型']['左侧'] || this.t.results.none;
+                            this.classification.right = data['AHA分型']['右侧'] || this.t.results.none;
+                        }
+                    } else {
+                        this.reasoning = data['Reasoning Process'] || '';
+                        if (data['AHA Classification']) {
+                            this.classification.left = data['AHA Classification']['Left'] || this.t.results.none;
+                            this.classification.right = data['AHA Classification']['Right'] || this.t.results.none;
                         }
                     }
+
+                    this.hasResults = true;
+                } else {
+                    // Try to parse raw output
+                    this.parseRawOutput(this.rawOutput);
                 }
+
             } catch (error) {
-                this.aiResult = `AI ${this.language === 'zh' ? '推理失败' : 'inference failed'}: ${error.message}`;
+                const errorMsg = error.response?.data?.error || error.message;
+                this.validationError = errorMsg;
             } finally {
-                this.aiLoading = false;
+                this.isAnalyzing = false;
             }
         },
 
-        // --- Custom Mode Methods ---
-        async switchMode(newMode) {
-            // Warn if unsaved changes
-            if (this.mode === 'excel' && !this.hasSubmitted) {
-                if (!confirm(this.t.mode.switchConfirm)) return;
-            }
-            if (this.mode === 'custom' && this.customFindings && !this.hasSubmitted) {
-                if (!confirm(this.t.mode.switchConfirm)) return;
-            }
-
+        // Parse raw output as fallback
+        parseRawOutput(raw) {
             try {
-                // Call backend to switch mode
-                await this.apiCall('mode/switch', 'POST', {
-                    username: this.username,
-                    mode: newMode
-                });
+                // Try direct JSON parsing
+                let parsed = JSON.parse(raw);
 
-                this.mode = newMode;
-                this.hasSubmitted = false;
-
-                // Load custom history if switching to custom mode
-                if (newMode === 'custom') {
-                    await this.loadCustomHistory();
-                    this.startTimer();  // Start timer for custom mode
-                }
-            } catch (error) {
-                // error message is shown by apiCall
-            }
-        },
-
-        async loadCustomHistory() {
-            try {
-                const data = await this.apiCall('custom/list', 'POST', {
-                    username: this.username
-                });
-                this.customHistory = data.evaluations;
-            } catch (error) {
-                // error message is shown by apiCall
-            }
-        },
-
-        async loadCustomEvaluation() {
-            if (!this.selectedCustomId) return;
-
-            try {
-                const data = await this.apiCall('custom/load', 'POST', {
-                    username: this.username,
-                    custom_id: this.selectedCustomId
-                });
-
-                // Populate form with loaded data
-                this.customFindings = data.findings;
-                this.leftAssessment = data.labels.left_assessment;
-                this.rightAssessment = data.labels.right_assessment;
-                this.leftConsistency = data.labels.left_usefulness;
-                this.rightConsistency = data.labels.right_usefulness;
-                this.aiResult = data.ai_result || '';
-                this.aiResultParsed = null;
-
-                // Try to parse AI result if it exists
-                if (this.aiResult) {
-                    try {
-                        this.aiResultParsed = JSON.parse(this.aiResult);
-                    } catch (e) {
-                        // Not JSON, that's okay
+                if (this.language === 'zh') {
+                    this.reasoning = parsed['推理过程'] || '';
+                    if (parsed['AHA分型']) {
+                        this.classification.left = parsed['AHA分型']['左侧'] || this.t.results.none;
+                        this.classification.right = parsed['AHA分型']['右侧'] || this.t.results.none;
+                    }
+                } else {
+                    this.reasoning = parsed['Reasoning Process'] || '';
+                    if (parsed['AHA Classification']) {
+                        this.classification.left = parsed['AHA Classification']['Left'] || this.t.results.none;
+                        this.classification.right = parsed['AHA Classification']['Right'] || this.t.results.none;
                     }
                 }
 
-                this.hasSubmitted = false;
-            } catch (error) {
-                // error message is shown by apiCall
+                this.hasResults = true;
+            } catch (e) {
+                // Try to extract JSON from markdown code block
+                const jsonMatch = raw.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
+                if (jsonMatch) {
+                    try {
+                        let parsed = JSON.parse(jsonMatch[1]);
+
+                        if (this.language === 'zh') {
+                            this.reasoning = parsed['推理过程'] || '';
+                            if (parsed['AHA分型']) {
+                                this.classification.left = parsed['AHA分型']['左侧'] || this.t.results.none;
+                                this.classification.right = parsed['AHA分型']['右侧'] || this.t.results.none;
+                            }
+                        } else {
+                            this.reasoning = parsed['Reasoning Process'] || '';
+                            if (parsed['AHA Classification']) {
+                                this.classification.left = parsed['AHA Classification']['Left'] || this.t.results.none;
+                                this.classification.right = parsed['AHA Classification']['Right'] || this.t.results.none;
+                            }
+                        }
+
+                        this.hasResults = true;
+                    } catch (e2) {
+                        // Display raw output if parsing fails
+                        this.hasResults = true;
+                        this.reasoning = raw;
+                    }
+                } else {
+                    // Display raw output
+                    this.hasResults = true;
+                    this.reasoning = raw;
+                }
             }
         },
 
-        async submitCustomEvaluation() {
-            if (!this.customFindings.trim()) {
-                this.showStatus(this.t.custom.emptyFindings, 'error');
+        // Submit classification (Step 1)
+        submitClassification() {
+            if (!this.userAssessment.left || !this.userAssessment.right) {
+                return;
+            }
+            // Move to step 2
+            this.evaluationStep = 2;
+        },
+
+        // Submit final evaluation (Step 2)
+        async submitFinalEvaluation() {
+            if (!this.userAssessment.leftUsefulness || !this.userAssessment.rightUsefulness) {
                 return;
             }
 
+            this.isSubmitting = true;
+
             try {
-                const payload = {
-                    username: this.username,
-                    findings: this.customFindings,
-                    labels: {
-                        left_assessment: this.leftAssessment,
-                        right_assessment: this.rightAssessment,
-                        left_usefulness: this.leftConsistency,
-                        right_usefulness: this.rightConsistency
-                    },
-                    ai_result: this.aiResult
+                // Convert numeric AHA types to Roman numerals for API
+                const labels = {
+                    left_assessment: this.userAssessment.left,
+                    right_assessment: this.userAssessment.right,
+                    left_usefulness: this.userAssessment.leftUsefulness,
+                    right_usefulness: this.userAssessment.rightUsefulness
                 };
 
-                const response = await this.apiCall('custom/submit', 'POST', payload);
-                this.hasSubmitted = true;
-                this.showStatus(this.translate('custom.submitSuccess', { id: response.custom_id }), 'success');
+                const response = await axios.post('/api/custom/submit', {
+                    username: this.username,
+                    findings: this.inputFindings,
+                    labels: labels,
+                    ai_result: this.rawOutput
+                });
 
-                // Refresh history
-                await this.loadCustomHistory();
+                if (response.data.error) {
+                    alert('Error: ' + response.data.error);
+                    return;
+                }
 
-                // Clear form
-                this.clearCustomForm();
+                this.submissionSuccess = true;
+
+                // Disable further editing
+                this.evaluationStep = 3; // Completed state
+
             } catch (error) {
-                // error message is shown by apiCall
+                console.error('Failed to submit evaluation:', error);
+                alert('Failed to submit evaluation: ' + (error.response?.data?.error || error.message));
+            } finally {
+                this.isSubmitting = false;
             }
-        },
-
-        clearCustomForm() {
-            this.customFindings = '';
-            this.selectedCustomId = null;
-            this.leftAssessment = 1;
-            this.rightAssessment = 1;
-            this.leftConsistency = 0;
-            this.rightConsistency = 0;
-            this.aiResult = '';
-            this.aiResultParsed = null;
-            this.hasSubmitted = false;
-            this.startTimer();  // Restart timer
-        },
-
-        // --- UI Helpers ---
-        showStatus(message, type = 'error') {
-            this.statusMessage = message;
-            this.statusClass = type; // 'success' or 'error'
-            setTimeout(() => {
-                this.statusMessage = '';
-            }, 4000);
         }
     },
     mounted() {
-        // Set initial language for document
+        // Set initial language
         document.documentElement.lang = this.language === 'zh' ? 'zh-CN' : 'en';
-    },
-    beforeUnmount() {
-        this.stopTimer();
-    },
-    watch: {
-        username(newUser) {
-            // Optional: save username to localStorage
-            // localStorage.setItem('medical-ass-user', newUser);
-        }
+
+        // Store username for evaluation
+        localStorage.setItem('evaluationUsername', this.username);
+
+        // Load examples
+        this.loadExamples();
     }
 }).mount('#app');
