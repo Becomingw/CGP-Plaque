@@ -1,13 +1,3 @@
----
-title: MRI AHA 斑块分型
-emoji: 🩺
-colorFrom: blue
-colorTo: indigo
-sdk: docker
-pinned: false
-license: mit
----
-
 <div align="center">
 
 # 基于知识引导的大语言模型实现颈动脉斑块改良AHA自动分型

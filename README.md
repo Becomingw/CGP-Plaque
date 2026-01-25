@@ -1,13 +1,3 @@
----
-title: MRI AHA Plaque Classification
-emoji: 🩺
-colorFrom: blue
-colorTo: indigo
-sdk: docker
-pinned: false
-license: mit
----
-
 <div align="center">
 
 # Knowledge-Guided Large Language Models for Automated Modified AHA Classification of Carotid Plaque
