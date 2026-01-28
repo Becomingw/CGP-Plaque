@@ -9,8 +9,11 @@
 [![Docker](https://img.shields.io/badge/docker-enabled-blue.svg)](https://www.docker.com/)
 
 **[中文文档](README_CN.md)** ·
-**[Live Demo](https://huggingface.co/spaces/your-space)** ·
 **[Paper](#citation)**
+
+[![Demo](https://img.shields.io/badge/🚀_Live_Demo-KGP--Plaque-brightgreen?style=for-the-badge)](https://spongebobkvin-kgp-plaque.hf.space/)
+[![Hugging Face Space](https://img.shields.io/badge/🤗_Hugging_Face-Space-yellow?style=for-the-badge)](https://huggingface.co/spaces/SpongeBobkvin/KGP-Plaque)
+[![Password](https://img.shields.io/badge/🔑_Password-REMOVED_ACCESS_CODE-blue?style=for-the-badge)]()
 
 </div>
 
@@ -218,7 +221,11 @@ Then configure your `api_config.json`:
 
 ## Live Demo
 
-Try the interactive demo on Hugging Face Spaces: [Demo Link](https://huggingface.co/spaces/your-space)
+Try the interactive demo on Hugging Face Spaces:
+
+[![Demo](https://img.shields.io/badge/🚀_Live_Demo-KGP--Plaque-brightgreen?style=for-the-badge)](https://spongebobkvin-kgp-plaque.hf.space/)
+[![Hugging Face Space](https://img.shields.io/badge/🤗_Hugging_Face-Space-yellow?style=for-the-badge)](https://huggingface.co/spaces/SpongeBobkvin/KGP-Plaque)
+[![Password](https://img.shields.io/badge/🔑_Password-REMOVED_ACCESS_CODE-blue?style=for-the-badge)]()
 
 ---
 

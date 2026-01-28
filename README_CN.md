@@ -9,8 +9,11 @@
 [![Docker](https://img.shields.io/badge/docker-enabled-blue.svg)](https://www.docker.com/)
 
 **[English](README.md)** ·
-**[在线演示](https://huggingface.co/spaces/your-space)** ·
 **[论文](#引用)**
+
+[![Demo](https://img.shields.io/badge/🚀_在线演示-KGP--Plaque-brightgreen?style=for-the-badge)](https://spongebobkvin-kgp-plaque.hf.space/)
+[![Hugging Face Space](https://img.shields.io/badge/🤗_Hugging_Face-Space-yellow?style=for-the-badge)](https://huggingface.co/spaces/SpongeBobkvin/KGP-Plaque)
+[![Password](https://img.shields.io/badge/🔑_访问密码-REMOVED_ACCESS_CODE-blue?style=for-the-badge)]()
 
 </div>
 
@@ -218,7 +221,11 @@ docker-compose up -d
 
 ## 在线演示
 
-在Hugging Face Spaces上试用交互式演示：[演示链接](https://huggingface.co/spaces/your-space)
+在Hugging Face Spaces上试用交互式演示：
+
+[![Demo](https://img.shields.io/badge/🚀_在线演示-KGP--Plaque-brightgreen?style=for-the-badge)](https://spongebobkvin-kgp-plaque.hf.space/)
+[![Hugging Face Space](https://img.shields.io/badge/🤗_Hugging_Face-Space-yellow?style=for-the-badge)](https://huggingface.co/spaces/SpongeBobkvin/KGP-Plaque)
+[![Password](https://img.shields.io/badge/🔑_访问密码-REMOVED_ACCESS_CODE-blue?style=for-the-badge)]()
 
 ---
 
