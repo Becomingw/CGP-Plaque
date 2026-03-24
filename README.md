@@ -11,9 +11,7 @@
 **[中文文档](README_CN.md)** ·
 **[Paper](#citation)**
 
-[![Demo](https://img.shields.io/badge/🚀_Live_Demo-KGP--Plaque-brightgreen?style=for-the-badge)](https://spongebobkvin-kgp-plaque.hf.space/)
-[![Hugging Face Space](https://img.shields.io/badge/🤗_Hugging_Face-Space-yellow?style=for-the-badge)](https://huggingface.co/spaces/SpongeBobkvin/KGP-Plaque)
-[![Password](https://img.shields.io/badge/🔑_Password-REMOVED_ACCESS_CODE-blue?style=for-the-badge)]()
+[![Demo](https://img.shields.io/badge/🚀_Live_Demo-CGP--Plaque-brightgreen?style=for-the-badge)](https://demo.scosine.org)
 
 </div>
 
@@ -223,9 +221,7 @@ Then configure your `api_config.json`:
 
 Try the interactive demo on Hugging Face Spaces:
 
-[![Demo](https://img.shields.io/badge/🚀_Live_Demo-KGP--Plaque-brightgreen?style=for-the-badge)](https://spongebobkvin-kgp-plaque.hf.space/)
-[![Hugging Face Space](https://img.shields.io/badge/🤗_Hugging_Face-Space-yellow?style=for-the-badge)](https://huggingface.co/spaces/SpongeBobkvin/KGP-Plaque)
-[![Password](https://img.shields.io/badge/🔑_Password-REMOVED_ACCESS_CODE-blue?style=for-the-badge)]()
+[![Demo](https://img.shields.io/badge/🚀_Live_Demo-CGP--Plaque-brightgreen?style=for-the-badge)](https://demo.scosine.org)
 
 ---
 
