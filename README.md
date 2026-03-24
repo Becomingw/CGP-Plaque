@@ -1,8 +1,8 @@
 <div align="center">
 
-# Knowledge-Guided Large Language Models for Automated Modified AHA Classification of Carotid Plaque
+# Large Language Model Assistance for Report-Based Carotid Plaque AHA Classification
 
-### A Multicenter Validation Study
+### Multicenter Reader Study
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
@@ -21,15 +21,15 @@
 
 ## Abstract
 
-Carotid atherosclerotic plaque rupture is a leading cause of ischemic stroke. The modified American Heart Association (AHA) classification based on high-resolution magnetic resonance imaging (HRMRI) enables risk stratification beyond stenosis degree. However, manual classification from free-text reports is time-consuming and yields suboptimal inter-rater consistency.
+Carotid atherosclerotic plaque rupture is a leading cause of ischemic stroke. The modified American Heart Association (AHA) classification based on high-resolution magnetic resonance imaging (HRMRI) enables risk stratification beyond stenosis degree. However, inferring standardized AHA classification from free-text reports is cognitively demanding and highly experience-dependent.
 
-We introduce **Knowledge-Guided Prompting (KGP)**, which embeds structured classification criteria into LLM prompts to enable accurate automated classification with traceable reasoning chains. This multicenter validation study includes **433 patients (866 carotid vessels)** from three medical centers.
+We propose **Criteria-Guided Prompting (CGP)**, which explicitly embeds the modified AHA classification criteria into LLM prompts, decomposing the task into two auditable steps — mapping signal descriptions to plaque components, then applying hierarchical criteria to assign the final type. This multicenter reader study includes **433 patients (866 carotid vessels)** from three institutions.
 
 <div align="center">
 
-![Study Workflow](fig/fig_1_pipeline.svg)
+![Study Workflow](fig/fig2.svg)
 
-**Figure 1.** Study design and Knowledge-Guided Prompting framework
+**Figure 2.** Overall study workflow and experimental design. **(a)** Reference standard establishment. **(b)** Standalone AI performance evaluation comparing a rule-based baseline against 10 LLMs under naive and criteria-guided prompting. **(c)** Human–AI collaboration reader study with a randomized crossover design and 6-week washout period.
 
 </div>
 
@@ -45,12 +45,12 @@ We introduce **Knowledge-Guided Prompting (KGP)**, which embeds structured class
 
 | Model | Accuracy |
 |:------|:--------:|
-| DeepSeek-R1 (KGP) | **87.41%** |
-| Qwen3-235B-Instruct (KGP) | 85.57% |
-| GLM-4.5 (KGP) | 85.45% |
-| Qwen3-8B (KGP) | 81.52% |
+| DeepSeek-R1 (CGP) | **87.41%** |
+| Qwen3-235B-Instruct (CGP) | 85.57% |
+| GLM-4.5 (CGP) | 85.45% |
+| Qwen3-8B (CGP) | 81.52% |
 
-**Qwen3-8B** improved from 38.91% to **81.52%** (+42.6 pp) with knowledge guidance.
+**Qwen3-8B** improved from 38.91% to **81.52%** (+42.6 pp) with criteria-guided prompting.
 
 </td>
 <td width="50%" valign="top">
@@ -59,8 +59,8 @@ We introduce **Knowledge-Guided Prompting (KGP)**, which embeds structured class
 
 | Task | Best Model | AUC |
 |:-----|:-----------|:---:|
-| Significant Plaques (III-VIII) | GLM-4.5 | **0.992** |
-| Type VI Complex Plaques | DeepSeek-R1 | **0.950** |
+| Advanced Lesion Detection (III–VIII vs Normal/I–II) | GLM-4.5 | **0.992** |
+| Type VI Complex Plaque Detection (VI vs non-VI) | DeepSeek-R1 | **0.950** |
 
 </td>
 </tr>
@@ -78,9 +78,9 @@ We introduce **Knowledge-Guided Prompting (KGP)**, which embeds structured class
 
 <div align="center">
 
-![Performance Comparison](fig/fig2_bar_chart.png)
+![Reader Study Performance](fig/figure_3.png)
 
-**Figure 2.** Six-class modified AHA classification performance comparison across models
+**Figure 3.** Reader study performance with AI assistance. **(a)** Vessel-level and **(b)** patient-level six-class accuracy for junior and senior radiologists under three conditions: no AI, Qwen3-8B assistance, and DeepSeek-R1 assistance. **(c)** Mean interpretation time per case. **(d)** Distribution of Diagnostic Assistance Utility Score (DAUS). AI assistance improved accuracy with larger gains in junior radiologists.
 
 </div>
 
@@ -88,20 +88,20 @@ We introduce **Knowledge-Guided Prompting (KGP)**, which embeds structured class
 
 ## Methodology
 
-### Knowledge-Guided Prompting (KGP)
+### Criteria-Guided Prompting (CGP)
 
-KGP embeds structured classification criteria directly into prompts, guiding LLMs through a two-step reasoning process:
+CGP explicitly embeds the modified AHA classification criteria into LLM prompts, guiding models through a two-step auditable reasoning process:
 
 **Step 1: Signal-to-Component Mapping**
 - T1WI/T2WI signal patterns → Tissue composition (lipid core, fibrous tissue, calcification)
 - Morphological features → Surface characteristics (ulceration, thrombosis)
 - Enhancement patterns → Tissue vascularity and inflammation
 
-**Step 2: Component-to-Type Assignment**
-- Synthesize identified components based on dominant pathological features
-- Apply differential criteria to determine final AHA classification
+**Step 2: Hierarchical Criteria Application**
+- Apply predefined classification rules in priority order to assign the final AHA type
+- Generate structured reasoning chains for clinical review
 
-This approach provides a lightweight alternative to RAG without external infrastructure.
+This approach aligns model outputs with established clinical rules without requiring fine-tuning or external knowledge bases.
 
 ---
 
@@ -232,13 +232,12 @@ Try the interactive demo on Hugging Face Spaces:
 ## Citation
 
 ```bibtex
-@article{kgp-aha-2025,
-  title={Knowledge-Guided Large Language Models for Automated Modified AHA
-         Classification of Carotid Plaque from Free-Text MRI Reports:
-         A Multicenter Validation Study},
+@article{cgp-aha-2026,
+  title={Large Language Model Assistance for Report-Based Carotid Plaque
+         AHA Classification: Multicenter Reader Study},
   author={...},
-  journal={...},
-  year={2025}
+  journal={Insights into Imaging},
+  year={2026}
 }
 ```
 

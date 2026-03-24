@@ -1,8 +1,8 @@
 <div align="center">
 
-# 基于知识引导的大语言模型实现颈动脉斑块改良AHA自动分型
+# 大语言模型辅助基于报告的颈动脉斑块AHA分型
 
-### 多中心验证研究
+### 多中心读片人研究
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
@@ -21,15 +21,15 @@
 
 ## 摘要
 
-颈动脉粥样硬化斑块破裂是缺血性卒中的主要原因。基于高分辨率磁共振成像（HRMRI）的改良美国心脏协会（AHA）分型系统可实现超越狭窄程度的风险分层。然而，从自由文本报告中进行人工分型耗时且阅片者间一致性欠佳。
+颈动脉粥样硬化斑块破裂是缺血性卒中的主要原因。基于高分辨率磁共振成像（HRMRI）的改良美国心脏协会（AHA）分型系统可实现超越狭窄程度的风险分层。然而，从自由文本报告中推断标准化AHA分型认知负荷高且高度依赖经验。
 
-我们提出**知识引导提示（KGP）**，将结构化分类标准嵌入LLM提示词中，实现准确的自动分类和可追溯的推理链。本多中心验证研究纳入了来自三家医疗中心的**433例患者（866条颈动脉）**。
+我们提出**标准引导提示（CGP, Criteria-Guided Prompting）**，将改良AHA分型标准显式嵌入LLM提示词中，将任务分解为两个可审计的步骤——将信号描述映射到斑块成分，然后应用层级标准确定最终分型。本多中心读片人研究纳入了来自三家医疗机构的**433例患者（866条颈动脉）**。
 
 <div align="center">
 
-![研究流程](fig/fig_1_pipeline.svg)
+![研究流程](fig/fig2.svg)
 
-**图1.** 研究设计和知识引导提示框架
+**图2.** 总体研究流程与实验设计。**(a)** 参考标准建立。**(b)** AI独立性能评估：对比规则基线与10个LLM在朴素提示和标准引导提示下的表现。**(c)** 人机协作读片人研究：采用随机交叉设计，设置6周洗脱期。
 
 </div>
 
@@ -45,12 +45,12 @@
 
 | 模型 | 准确率 |
 |:------|:--------:|
-| DeepSeek-R1 (KGP) | **87.41%** |
-| Qwen3-235B-Instruct (KGP) | 85.57% |
-| GLM-4.5 (KGP) | 85.45% |
-| Qwen3-8B (KGP) | 81.52% |
+| DeepSeek-R1 (CGP) | **87.41%** |
+| Qwen3-235B-Instruct (CGP) | 85.57% |
+| GLM-4.5 (CGP) | 85.45% |
+| Qwen3-8B (CGP) | 81.52% |
 
-**Qwen3-8B** 在知识引导下从38.91%提升至**81.52%**（+42.6 pp）
+**Qwen3-8B** 在标准引导提示下从38.91%提升至**81.52%**（+42.6 pp）
 
 </td>
 <td width="50%" valign="top">
@@ -59,8 +59,8 @@
 
 | 任务 | 最佳模型 | AUC |
 |:-----|:-----------|:---:|
-| 显著斑块检测（III-VIII型） | GLM-4.5 | **0.992** |
-| VI型复杂斑块检测 | DeepSeek-R1 | **0.950** |
+| 进展性病变检测（III–VIII vs Normal/I–II） | GLM-4.5 | **0.992** |
+| VI型复杂斑块检测（VI vs non-VI） | DeepSeek-R1 | **0.950** |
 
 </td>
 </tr>
@@ -78,9 +78,9 @@
 
 <div align="center">
 
-![性能对比](fig/fig2_bar_chart.png)
+![读片人研究表现](fig/figure_3.png)
 
-**图2.** 各模型六分类改良AHA分型性能对比
+**图3.** AI辅助下的读片人研究表现。**(a)** 血管水平和 **(b)** 患者水平六分类准确率。**(c)** 每例平均判读时间。**(d)** 诊断辅助效用评分（DAUS）分布。AI辅助提高了诊断准确率，初级医师获益最大。
 
 </div>
 
@@ -88,20 +88,20 @@
 
 ## 方法学
 
-### 知识引导提示（KGP）
+### 标准引导提示（CGP）
 
-KGP将结构化分类标准直接嵌入提示词中，引导LLM通过两步推理过程：
+CGP将改良AHA分型标准显式嵌入LLM提示词中，引导模型通过两步可审计推理过程：
 
 **步骤1：信号到成分映射**
 - T1WI/T2WI信号模式 → 组织成分（脂质核心、纤维组织、钙化）
 - 形态学特征 → 表面特征（溃疡、血栓）
 - 强化模式 → 组织血管化和炎症
 
-**步骤2：成分到类型分配**
-- 基于主要病理特征综合识别的成分
-- 应用鉴别标准确定最终AHA分型
+**步骤2：层级标准应用**
+- 按优先级顺序应用预定义分类规则，确定最终AHA分型
+- 生成结构化推理链供临床审阅
 
-该方法提供了一种轻量级的RAG替代方案，无需外部基础设施。
+该方法使模型输出与既定临床规则对齐，无需微调或外部知识库。
 
 ---
 
@@ -232,13 +232,12 @@ docker-compose up -d
 ## 引用
 
 ```bibtex
-@article{kgp-aha-2025,
-  title={Knowledge-Guided Large Language Models for Automated Modified AHA
-         Classification of Carotid Plaque from Free-Text MRI Reports:
-         A Multicenter Validation Study},
+@article{cgp-aha-2026,
+  title={Large Language Model Assistance for Report-Based Carotid Plaque
+         AHA Classification: Multicenter Reader Study},
   author={...},
-  journal={...},
-  year={2025}
+  journal={Insights into Imaging},
+  year={2026}
 }
 ```
 

@@ -147,7 +147,7 @@ os.makedirs(USER_DATA_PATH, exist_ok=True)
 PROMPT_DIR = os.path.join(os.path.dirname(__file__), "Prompt")
 PROMPTS = {}
 LANG_SUFFIX = {"zh": "CN", "en": "EN"}
-for version in ["NP", "KGP"]:
+for version in ["NP", "CGP"]:
     PROMPTS[version] = {}
     for lang in ["zh", "en"]:
         suffix = LANG_SUFFIX[lang]

@@ -10,9 +10,9 @@ license: mit
 
 <div align="center">
 
-# Knowledge-Guided LLMs for Carotid Plaque Classification
+# LLM-Assisted Carotid Plaque AHA Classification
 
-Live demo for the research paper: *Knowledge-Guided Large Language Models for Automated Modified AHA Classification of Carotid Plaque from Free-Text MRI Reports: A Multicenter Validation Study*
+Live demo for the research paper: *Large Language Model Assistance for Report-Based Carotid Plaque AHA Classification: Multicenter Reader Study*
 
 **[GitHub Repository](https://github.com/WangMemPhy/KGP-Plaque)** · **[Paper](#citation)**
 
@@ -22,12 +22,12 @@ Live demo for the research paper: *Knowledge-Guided Large Language Models for Au
 
 ## About This Demo
 
-This interactive demo allows you to test our Knowledge-Guided Prompting (KGP) approach for automated carotid plaque classification from MRI reports.
+This interactive demo allows you to test our Criteria-Guided Prompting (CGP) approach for report-based carotid plaque AHA classification from MRI reports.
 
 ### Key Features
 
 - **Bilingual Interface**: Switch between Chinese/English
-- **Prompt Comparison**: Toggle between Naive Prompting (NP) and Knowledge-Guided Prompting (KGP)
+- **Prompt Comparison**: Toggle between Naive Prompting (NP) and Criteria-Guided Prompting (CGP)
 - **Example Cases**: Pre-loaded clinical cases from validation study
 - **Traceable Reasoning**: View AI's step-by-step reasoning process
 
@@ -35,8 +35,8 @@ This interactive demo allows you to test our Knowledge-Guided Prompting (KGP) ap
 
 | Model | Accuracy | Notes |
 |:------|:--------:|:------|
-| DeepSeek-R1 (KGP) | **87.41%** | Highest accuracy |
-| Qwen3-8B (KGP) | **81.52%** | +42.6 pp improvement with KGP |
+| DeepSeek-R1 (CGP) | **87.41%** | Highest accuracy |
+| Qwen3-8B (CGP) | **81.52%** | +42.6 pp improvement with CGP |
 | Clinical Validation | **90.00%** | Physician accuracy with AI assistance |
 
 ---
@@ -45,8 +45,8 @@ This interactive demo allows you to test our Knowledge-Guided Prompting (KGP) ap
 
 1. **Select Language**: Choose Chinese (中文) or English
 2. **Choose Prompt Version**: 
-   - **NP**: Naive prompting (baseline)
-   - **KGP**: Knowledge-Guided Prompting (recommended)
+   - **NP**: Naive Prompting (baseline)
+   - **CGP**: Criteria-Guided Prompting (recommended)
 3. **Input MRI Findings**: 
    - Click on example cases, or
    - Enter custom MRI report text
@@ -74,13 +74,12 @@ This interactive demo allows you to test our Knowledge-Guided Prompting (KGP) ap
 ## Citation
 
 ```bibtex
-@article{kgp-aha-2025,
-  title={Knowledge-Guided Large Language Models for Automated Modified AHA
-         Classification of Carotid Plaque from Free-Text MRI Reports:
-         A Multicenter Validation Study},
+@article{cgp-aha-2026,
+  title={Large Language Model Assistance for Report-Based Carotid Plaque
+         AHA Classification: Multicenter Reader Study},
   author={...},
-  journal={...},
-  year={2025}
+  journal={Insights into Imaging},
+  year={2026}
 }
 ```
 
