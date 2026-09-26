@@ -4,7 +4,7 @@ const { createApp } = Vue;
 const translations = {
     zh: {
         title: 'MRI AHA 斑块分型评估系统',
-        subtitle: '基于深度学习的高分辨率颈动脉斑块分析 | Live Demo',
+        subtitle: '基于 MRI 报告文本的大语言模型辅助 AHA 分型',
         examples: {
             title: '示例病例'
         },
@@ -16,7 +16,7 @@ const translations = {
         },
         evaluation: {
             title: '评估打分',
-            description: '请完成以下两步评估：先进行 AHA 分型打分，提交后再进行有用性评分',
+            description: '先选择 AHA 分型，再进行有用性评分。提交后，报告文本、AI 输出和评分将保存到本地服务器。',
             step1Title: 'AHA 分型打分',
             step2Title: 'AI 结果有用性评分',
             leftAHA: '左侧 AHA 分型',
@@ -41,26 +41,26 @@ const translations = {
             aiResult: 'AI 结果'
         },
         footer: {
-            text: 'MRI AHA Plaque Classification System | Academic Live Demo | Powered by Deep Learning'
+            text: 'CGP-Plaque | 基于报告文本的大语言模型辅助分型'
         },
         validation: {
             empty: '输入为空',
             invalid: '无效预测，请检查输入为正确的HRMRI影像描述'
         },
         ahaTypes: {
-            'I': 'Type I',
-            'II': 'Type II',
+            'I-II': 'Type I-II',
             'III': 'Type III',
-            'IV': 'Type IV',
-            'V': 'Type V',
+            'IV-V': 'Type IV-V',
             'VI': 'Type VI',
             'VII': 'Type VII',
-            'VIII': 'Type VIII'
+            'VIII': 'Type VIII',
+            'None': '无斑块',
+            'NA': '不适用（NA）'
         }
     },
     en: {
         title: 'MRI AHA Plaque Classification System',
-        subtitle: 'Deep Learning-based High-Resolution Carotid Plaque Analysis | Live Demo',
+        subtitle: 'LLM-assisted AHA classification from MRI report text',
         examples: {
             title: 'Example Cases'
         },
@@ -72,7 +72,7 @@ const translations = {
         },
         evaluation: {
             title: 'Evaluation Scoring',
-            description: 'Complete the two-step evaluation: First provide AHA classification scores, then rate usefulness',
+            description: 'Select AHA classifications, then rate usefulness. Submitting saves report text, AI output, and ratings on the local server.',
             step1Title: 'AHA Classification Scoring',
             step2Title: 'AI Result Usefulness Rating',
             leftAHA: 'Left AHA Type',
@@ -97,21 +97,21 @@ const translations = {
             aiResult: 'AI Result'
         },
         footer: {
-            text: 'MRI AHA Plaque Classification System | Academic Live Demo | Powered by Deep Learning'
+            text: 'CGP-Plaque | LLM-assisted report-based classification'
         },
         validation: {
             empty: 'Input is empty',
             invalid: 'Invalid prediction, please check input is correct HRMRI imaging description'
         },
         ahaTypes: {
-            'I': 'Type I',
-            'II': 'Type II',
+            'I-II': 'Type I-II',
             'III': 'Type III',
-            'IV': 'Type IV',
-            'V': 'Type V',
+            'IV-V': 'Type IV-V',
             'VI': 'Type VI',
             'VII': 'Type VII',
-            'VIII': 'Type VIII'
+            'VIII': 'Type VIII',
+            'None': 'No plaque',
+            'NA': 'Not applicable (NA)'
         }
     }
 };
@@ -120,10 +120,10 @@ createApp({
     data() {
         return {
             // Language
-            language: localStorage.getItem('language') || 'zh',
+            language: ['zh', 'en'].includes(localStorage.getItem('language')) ? localStorage.getItem('language') : 'zh',
 
             // Prompt Version
-            promptVersion: localStorage.getItem('promptVersion') || 'NP',
+            promptVersion: ['NP', 'CGP'].includes(localStorage.getItem('promptVersion')) ? localStorage.getItem('promptVersion') : 'NP',
 
             // Examples
             examples: [],
@@ -142,10 +142,11 @@ createApp({
             showRawOutput: false,
 
             // Evaluation state
+            evaluationStorageEnabled: false,
             evaluationStep: 1, // 1: classification, 2: usefulness
             userAssessment: {
-                left: 'I',
-                right: 'I',
+                left: '',
+                right: '',
                 leftUsefulness: null,
                 rightUsefulness: null
             },
@@ -153,7 +154,7 @@ createApp({
             submissionSuccess: false,
 
             // Username for evaluation (stored in localStorage)
-            username: localStorage.getItem('evaluationUsername') || 'demo_user_' + Math.random().toString(36).slice(2, 11)
+            username: localStorage.getItem('evaluationUsername') || 'local_user_' + Math.random().toString(36).slice(2, 11)
         };
     },
     computed: {
@@ -165,6 +166,15 @@ createApp({
         }
     },
     methods: {
+        async loadSettings() {
+            try {
+                const response = await axios.get('/api/settings');
+                this.evaluationStorageEnabled = response.data.evaluation_storage_enabled === true;
+            } catch {
+                this.evaluationStorageEnabled = false;
+            }
+        },
+
         // Language switching
         switchLanguage(lang) {
             this.language = lang;
@@ -258,8 +268,8 @@ createApp({
             this.showRawOutput = false;
             this.evaluationStep = 1;
             this.userAssessment = {
-                left: 'I',
-                right: 'I',
+                left: '',
+                right: '',
                 leftUsefulness: null,
                 rightUsefulness: null
             };
@@ -396,7 +406,7 @@ createApp({
 
         // Submit final evaluation (Step 2)
         async submitFinalEvaluation() {
-            if (!this.userAssessment.leftUsefulness || !this.userAssessment.rightUsefulness) {
+            if (!this.evaluationStorageEnabled || !this.userAssessment.leftUsefulness || !this.userAssessment.rightUsefulness) {
                 return;
             }
 
@@ -445,5 +455,6 @@ createApp({
 
         // Load examples
         this.loadExamples();
+        this.loadSettings();
     }
 }).mount('#app');

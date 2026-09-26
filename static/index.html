@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MRI AHA Plaque Classification System | Live Demo</title>
+    <title>CGP-Plaque | Report-based AHA Classification</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -115,7 +115,7 @@
                 </div>
 
                 <!-- Evaluation Section (Bottom) -->
-                <div class="evaluation-container" v-if="hasResults">
+                <div class="evaluation-container" v-if="hasResults && evaluationStorageEnabled">
                     <div class="section-header">
                         <h2 class="section-title">{{ t.evaluation.title }}</h2>
                         <p class="section-description">{{ t.evaluation.description }}</p>
@@ -137,6 +137,7 @@
                             <div class="input-group">
                                 <label>{{ t.evaluation.leftAHA }}</label>
                                 <select v-model="userAssessment.left">
+                                    <option disabled value="">—</option>
                                     <option v-for="type in ahaTypes" :key="type.value" :value="type.value">
                                         {{ type.label }}
                                     </option>
@@ -145,6 +146,7 @@
                             <div class="input-group">
                                 <label>{{ t.evaluation.rightAHA }}</label>
                                 <select v-model="userAssessment.right">
+                                    <option disabled value="">—</option>
                                     <option v-for="type in ahaTypes" :key="type.value" :value="type.value">
                                         {{ type.label }}
                                     </option>

@@ -2,13 +2,13 @@ version: "3.9"
 
 services:
   deepseek_v3:
-    image: vllm/vllm-openai:v0.8.4
+    image: ${IMAGE:?Set IMAGE to a model-compatible vLLM image}
     container_name: deepseek-v3-model-server
     restart: unless-stopped
     gpus: all
 
     ports:
-      - "${PORT:-9990}:9990"
+      - "${BIND_HOST:-127.0.0.1}:${PORT:-9990}:9990"
 
     shm_size: "${SHM_SIZE:-20gb}"
     ipc: host
@@ -19,13 +19,13 @@ services:
       - CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0,1,2,3,4,5,6,7}
 
     volumes:
-      - ${MODEL_DIR:-/data/models}:/models:ro
+      - ${MODEL_DIR:?Set MODEL_DIR to the model weights directory}:/models:ro
       - ${HF_CACHE_DIR:-./.hf_cache}:/root/.cache/huggingface
 
     entrypoint:
       - "vllm"
       - "serve"
-      - "${MODEL_PATH:-/models/DeepSeek-V3-0324}"
+      - "${MODEL_PATH:-/models}"
       - "--served-model-name"
       - "${SERVED_MODEL_NAME:-deepseek-chat}"
       - "--trust-remote-code"
@@ -40,7 +40,7 @@ services:
       - "--tool-call-parser"
       - "${TOOL_CALL_PARSER:-hermes}"
       - "--api-key"
-      - "${VLLM_API_KEY:-REPLACE_WITH_YOUR_VLLM_API_KEY}"
+      - "${VLLM_API_KEY:?Set VLLM_API_KEY to a private random key}"
+      - "--disable-log-requests"
       - "--gpu-memory-utilization"
       - "${GPU_MEMORY_UTILIZATION:-0.95}"
-

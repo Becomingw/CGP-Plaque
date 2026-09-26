@@ -2,13 +2,13 @@ version: "3.9"
 
 services:
   qwen3_8b:
-    image: ${IMAGE:-vllm/vllm-openai:v0.8.4}
+    image: ${IMAGE:?Set IMAGE to a model-compatible vLLM image}
     container_name: qwen3-8b-model-server
     restart: unless-stopped
     gpus: all
 
     ports:
-      - "${PORT:-9002}:9002"
+      - "${BIND_HOST:-127.0.0.1}:${PORT:-9002}:9002"
 
     shm_size: "${SHM_SIZE:-20gb}"
     ipc: host
@@ -20,7 +20,7 @@ services:
       - VLLM_USE_MODELSCOPE=${VLLM_USE_MODELSCOPE:-True}
 
     volumes:
-      - ${MODEL_DIR:-/mnt/e/OpensourceModel/qwen3_8b}:/models:ro
+      - ${MODEL_DIR:?Set MODEL_DIR to the model weights directory}:/models:ro
       - ${HF_CACHE_DIR:-./.hf_cache}:/root/.cache/huggingface
 
     entrypoint:
@@ -37,7 +37,7 @@ services:
       - "--max-model-len"
       - "${MAX_MODEL_LEN:-8192}"
       - "--api-key"
-      - "${VLLM_API_KEY:-REPLACE_WITH_YOUR_VLLM_API_KEY}"
+      - "${VLLM_API_KEY:?Set VLLM_API_KEY to a private random key}"
+      - "--disable-log-requests"
       - "--gpu-memory-utilization"
       - "${GPU_MEMORY_UTILIZATION:-0.85}"
-

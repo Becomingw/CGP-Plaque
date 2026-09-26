@@ -1,19 +1,19 @@
 <div align="center">
 
-# 大语言模型辅助基于报告的颈动脉斑块AHA分型
+# Large language model assistance for report-based carotid plaque AHA classification: a multi-reader study
 
-### 多中心读片人研究
+### 大语言模型辅助基于报告的颈动脉斑块 AHA 分型：一项多阅片者研究
+
+[![已接受 · Insights into Imaging](https://img.shields.io/badge/Accepted-Insights_into_Imaging-276678?style=flat-square&labelColor=334155)](https://link.springer.com/journal/13244)
+![影响因子 · 5.7](https://img.shields.io/badge/Impact_Factor-5.7-52796F?style=flat-square&labelColor=334155)
+![JCR · Q1](https://img.shields.io/badge/JCR-Q1-6D597A?style=flat-square&labelColor=334155)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![Docker](https://img.shields.io/badge/docker-enabled-blue.svg)](https://www.docker.com/)
 
 **[English](README.md)** ·
 **[论文](#引用)**
-
-[![Demo](https://img.shields.io/badge/🚀_在线演示-KGP--Plaque-brightgreen?style=for-the-badge)](https://spongebobkvin-kgp-plaque.hf.space/)
-[![Hugging Face Space](https://img.shields.io/badge/🤗_Hugging_Face-Space-yellow?style=for-the-badge)](https://huggingface.co/spaces/SpongeBobkvin/KGP-Plaque)
-[![Password](https://img.shields.io/badge/🔑_访问密码-REMOVED_ACCESS_CODE-blue?style=for-the-badge)]()
 
 </div>
 
@@ -23,7 +23,7 @@
 
 颈动脉粥样硬化斑块破裂是缺血性卒中的主要原因。基于高分辨率磁共振成像（HRMRI）的改良美国心脏协会（AHA）分型系统可实现超越狭窄程度的风险分层。然而，从自由文本报告中推断标准化AHA分型认知负荷高且高度依赖经验。
 
-我们提出**标准引导提示（CGP, Criteria-Guided Prompting）**，将改良AHA分型标准显式嵌入LLM提示词中，将任务分解为两个可审计的步骤——将信号描述映射到斑块成分，然后应用层级标准确定最终分型。本多中心读片人研究纳入了来自三家医疗机构的**433例患者（866条颈动脉）**。
+我们提出**标准引导提示（CGP, Criteria-Guided Prompting）**，将改良AHA分型标准显式嵌入LLM提示词中，引导模型将信号描述映射到斑块成分，再根据分型标准确定最终分型。本多中心读片人研究纳入了来自三家医疗机构的**433例患者（866条颈动脉）**。
 
 <div align="center">
 
@@ -36,6 +36,8 @@
 ---
 
 ## 核心结果
+
+以下数值为研究结果摘要。本仓库提供 Web 应用、提示词和部署模板，未包含完整研究数据集或统计评估流程。
 
 <table>
 <tr>
@@ -66,7 +68,7 @@
 </tr>
 </table>
 
-### 临床验证（多阅片者研究，n=4名放射科医师）
+### 多阅片者研究（n=4名放射科医师）
 
 | 条件 | 准确率 | 加权κ |
 |:----------|:--------:|:----------:|
@@ -75,6 +77,8 @@
 
 - 初级医师：**+26 pp** 提升
 - 高级医师：**+15 pp** 提升
+
+DeepSeek-R1 辅助增加了研究中的判读时间（图3c），体现了准确率与耗时之间的权衡。
 
 <div align="center">
 
@@ -90,18 +94,18 @@
 
 ### 标准引导提示（CGP）
 
-CGP将改良AHA分型标准显式嵌入LLM提示词中，引导模型通过两步可审计推理过程：
+CGP将改良AHA分型标准显式嵌入LLM提示词中，要求模型提供涵盖以下两步的结构化解释：
 
 **步骤1：信号到成分映射**
 - T1WI/T2WI信号模式 → 组织成分（脂质核心、纤维组织、钙化）
 - 形态学特征 → 表面特征（溃疡、血栓）
 - 强化模式 → 组织血管化和炎症
 
-**步骤2：层级标准应用**
-- 按优先级顺序应用预定义分类规则，确定最终AHA分型
-- 生成结构化推理链供临床审阅
+**步骤2：基于标准进行分型**
+- 将报告中的成分及结构特征与提供的标准进行比较，确定AHA分型
+- 生成结构化解释供审阅
 
-该方法使模型输出与既定临床规则对齐，无需微调或外部知识库。
+该方法直接提供临床分型标准，无需微调或检索外部知识库。应用验证的是响应结构，不独立验证模型解释或分型的临床正确性。
 
 ---
 
@@ -116,7 +120,7 @@ CGP将改良AHA分型标准显式嵌入LLM提示词中，引导模型通过两�
 | **VII** | 钙化斑块 | T1/T2极低信号（信号消失） |
 | **VIII** | 无脂质核心的纤维斑块 | T2WI等信号，均匀强化 |
 
-> **临床意义**：VI型（伴斑块内出血的复杂斑块）使缺血风险增加5-6倍。
+此表为简化概述。应用对报告文本进行分型，不直接分析 MRI 图像。
 
 ---
 
@@ -124,21 +128,26 @@ CGP将改良AHA分型标准显式嵌入LLM提示词中，引导模型通过两�
 
 ### 环境要求
 
-- Python 3.8+
+- Python 3.10+
 - NVIDIA GPU（本地部署LLM时需要，可选）
 
 ### 本地开发
 
 ```bash
 # 克隆仓库
-git clone https://github.com/your-repo/LLMAHA_Web.git
-cd LLMAHA_Web
+git clone https://github.com/Becomingw/CGP-Plaque.git
+cd CGP-Plaque
+
+# 创建独立环境
+python -m venv .venv
+source .venv/bin/activate
 
 # 安装依赖
 pip install -r requirements.txt
 
 # 配置API（复制并编辑）
-cp api_config.example.json api_config.json
+cp api_config_example.json api_config.json
+# 编辑 api_config.json，填写端点、模型名称和 API 密钥
 
 # 启动服务器
 python app.py
@@ -150,12 +159,12 @@ python app.py
 ```bash
 # 构建并运行
 docker build -t aha-classifier .
-docker run -p 7860:7860 \
-  -e API_KEY=your-api-key \
-  -e API_BASE_URL=https://api.example.com/v1 \
-  -e API_MODEL=model-name \
+docker run --rm -p 127.0.0.1:7860:7860 \
+  -e API_KEY -e API_BASE_URL -e API_MODEL \
   aha-classifier
 ```
+
+运行容器前，在 shell 中设置 `API_KEY`、`API_BASE_URL` 和 `API_MODEL`。镜像不包含本地 API 配置或用户数据。
 
 ---
 
@@ -168,12 +177,22 @@ docker run -p 7860:7860 \
 | `API_MODEL` | 模型名称 | - |
 | `API_MAX_TOKENS` | 最大令牌数 | 4096 |
 | `API_TEMPERATURE` | 采样温度 | 0.1 |
+| `API_NO_THINK` | 是否附加提供商特定的 `/no_think` 指令 | false |
+| `HOST` | Web 服务监听地址（Docker 中设为 `0.0.0.0`） | 127.0.0.1 |
+| `PORT` | Web 服务端口 | 7860 |
+| `ENABLE_EVALUATION_STORAGE` | 是否将提交的报告、模型输出和评分保存至 `user_data/` | false |
+
+完整的 API 环境变量配置优先于 `api_config.json`。
+
+### 数据处理
+
+报告文本会发送至配置的 LLM API 端点，请使用去标识化输入。评估存储默认关闭；启用后会将提交的报告文本和模型输出写入本地 JSON 文件。应用没有用户身份认证，适用于本地研究。浏览器资源从 Google Fonts 和 unpkg 加载。
 
 ---
 
 ## 本地LLM部署（vLLM）
 
-`deploy/` 目录包含使用vLLM在本地部署模型的Docker Compose配置：
+`deploy/` 目录包含使用 vLLM 本地部署模型的 Docker Compose 模板。请显式设置 `MODEL_DIR`、`VLLM_API_KEY` 和 `IMAGE`，选择兼容模型架构及 CUDA/GPU 环境的 vLLM 镜像；这些模板不代表已验证的全部研究运行环境。
 
 ```
 deploy/
@@ -193,23 +212,24 @@ cd deploy/qwen3_8b
 
 # 配置环境变量
 export MODEL_DIR=/path/to/qwen3_8b_weights
-export VLLM_API_KEY=your-secret-key
+export VLLM_API_KEY="$(python -c 'import secrets; print(secrets.token_urlsafe(32))')"
+export IMAGE='vllm/vllm-openai:<compatible-version>'
 export CUDA_VISIBLE_DEVICES=0
 
 # 启动服务
-docker-compose up -d
+docker compose up -d
 
 # 服务地址 http://localhost:9002
 ```
 
-然后配置 `api_config.json`：
+然后配置 `api_config.json`，使用上面生成的同一密钥。如果 Web 应用运行在容器内，`localhost` 指向该容器本身，应改为容器可访问的端点（例如 Docker Desktop 的 `host.docker.internal`）：
 
 ```json
 {
   "api_configs": [{
     "name": "qwen3-8b-local",
     "base_url": "http://localhost:9002/v1",
-    "api_key": "your-secret-key",
+    "api_key": "REPLACE_WITH_YOUR_VLLM_API_KEY",
     "model": "qwen3_8b",
     "enabled": true
   }],
@@ -219,30 +239,14 @@ docker-compose up -d
 
 ---
 
-## 在线演示
-
-在Hugging Face Spaces上试用交互式演示：
-
-[![Demo](https://img.shields.io/badge/🚀_在线演示-KGP--Plaque-brightgreen?style=for-the-badge)](https://spongebobkvin-kgp-plaque.hf.space/)
-[![Hugging Face Space](https://img.shields.io/badge/🤗_Hugging_Face-Space-yellow?style=for-the-badge)](https://huggingface.co/spaces/SpongeBobkvin/KGP-Plaque)
-[![Password](https://img.shields.io/badge/🔑_访问密码-REMOVED_ACCESS_CODE-blue?style=for-the-badge)]()
-
----
-
 ## 引用
 
-```bibtex
-@article{cgp-aha-2026,
-  title={Large Language Model Assistance for Report-Based Carotid Plaque
-         AHA Classification: Multicenter Reader Study},
-  author={...},
-  journal={Insights into Imaging},
-  year={2026}
-}
-```
+**Large language model assistance for report-based carotid plaque AHA classification: a multi-reader study.** _Insights into Imaging_. **已接受。**
+
+正式出版信息公布后，将补充完整引用和 DOI。
 
 ---
 
 ## 许可证
 
-本项目采用 MIT 许可证。
+本项目采用 [MIT 许可证](LICENSE)。

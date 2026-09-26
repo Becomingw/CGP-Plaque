@@ -2,13 +2,13 @@ version: "3.9"
 
 services:
   glm4.5:
-    image: ${IMAGE:-vllm/vllm-openai:v0.8.4}
+    image: ${IMAGE:?Set IMAGE to a model-compatible vLLM image}
     container_name: glm-4.5-model-server
     restart: unless-stopped
     gpus: all
 
     ports:
-      - "${PORT:-9005}:9005"
+      - "${BIND_HOST:-127.0.0.1}:${PORT:-9005}:9005"
 
     shm_size: "${SHM_SIZE:-20gb}"
     ipc: host
@@ -20,7 +20,7 @@ services:
       - PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
     volumes:
-      - ${MODEL_DIR:-/data/truenas_B2/OpenSourceLLM/GLM-4.5}:/models:ro
+      - ${MODEL_DIR:?Set MODEL_DIR to the model weights directory}:/models:ro
       - ${HF_CACHE_DIR:-./.hf_cache}:/root/.cache/huggingface
 
     entrypoint:
@@ -37,8 +37,7 @@ services:
       - "--max-model-len"
       - "${MAX_MODEL_LEN:-16384}"
       - "--api-key"
-      - "${VLLM_API_KEY:-REPLACE_WITH_YOUR_VLLM_API_KEY}"
+      - "${VLLM_API_KEY:?Set VLLM_API_KEY to a private random key}"
       - "--gpu-memory-utilization"
       - "${GPU_MEMORY_UTILIZATION:-0.7}"
       - "--disable-log-requests"
-

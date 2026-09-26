@@ -1,0 +1,14 @@
+.git
+.env
+.env.*
+.venv
+venv
+__pycache__
+**/__pycache__
+*.pyc
+api_config*.json
+user_data
+*.log
+.pytest_cache
+tests
+.DS_Store

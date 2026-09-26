@@ -7,12 +7,15 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application files
-COPY . .
+COPY app.py .
+COPY Prompt/ Prompt/
+COPY static/ static/
 
 # Create user_data directory
 RUN mkdir -p user_data
 
-# Expose port 7860 (HF Spaces default)
+# Listen inside the container; bind the published port on the host as needed
+ENV HOST=0.0.0.0
 EXPOSE 7860
 
 # Run the application

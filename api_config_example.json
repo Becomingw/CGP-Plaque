@@ -1,29 +1,14 @@
 {
-    "api_configs": [
-      {
-        "name": "DeepSeek-V3",
-        "base_url": "https://api.siliconflow.cn/v1",
-        "api_key": "XXXX",
-        "model": "deepseek-ai/DeepSeek-V3",
-        "max_tokens": 4096,
-        "temperature": 0.3,
-        "enable_thinking": false,
-        "thinking_budget": 2048,
-        "timeout": 30,
-        "request_delay": 1.0,
-        "enabled": false
-      },
-      {
-        "name": "qwen3_8b",
-        "base_url": "http://192.168.8.21:9021/v1",
-        "api_key": "REPLACE_WITH_YOUR_VLLM_API_KEY",
-        "model": "qwen3_8b",
-        "max_tokens": 4096,
-        "temperature": 0.1,
-        "thinking_budget": 2048,
-        "timeout": 100,
-        "enabled": true
-      }
-    ],
-    "use_name": "qwen3_8b" 
-  }
+  "api_configs": [
+    {
+      "name": "qwen3-8b-local",
+      "base_url": "http://localhost:9002/v1",
+      "api_key": "REPLACE_WITH_YOUR_VLLM_API_KEY",
+      "model": "qwen3_8b",
+      "max_tokens": 4096,
+      "temperature": 0.1,
+      "enabled": true
+    }
+  ],
+  "use_name": "qwen3-8b-local"
+}
